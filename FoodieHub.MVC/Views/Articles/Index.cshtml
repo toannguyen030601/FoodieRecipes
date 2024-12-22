@@ -1,0 +1,237 @@
+﻿@using FoodieHub.MVC.Models.Article
+@using FoodieHub.MVC.Service.Interfaces
+@model ArticleViewModel
+@inject IConfiguration config
+@inject IUserService userService
+@{
+    ViewData["Title"] = "Articles";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var url = config["BaseHost"];
+    var admins = await userService.GetAdmin();
+    var data = ViewBag.Data as IEnumerable<ArticleByCategory> ?? new List<ArticleByCategory>();
+}
+
+<div class="container my-5">
+    <div class="row">
+        <!-- Page Title Section -->
+        <h1 class="text-center my-5 text-uppercase font-weight-bold">Featured Articles</h1>
+
+        <!-- Featured Article Section -->
+        <div class="col-lg-5 col-md-6 mb-4">
+            @if (Model.TopArticles.Count() > 0)
+            {
+                <div class="card shadow-sm border-0">
+                    <img src="@($"{url}/images/{Model.TopArticles.First().MainImage}")" alt="Feature Article Image" class="card-img-top">
+                    <div class="card-body">
+                        <p class="text-muted">Favorite Article</p>
+                        <h3 class="card-title">
+                            <a href="@Url.Action("Detail", new { id = Model.TopArticles.First().ArticleID })" class="text-dark">@Model.TopArticles.First().Title</a>
+                        </h3>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <p>No favorite article available.</p>
+            }
+        </div>
+
+        <!-- Spacer -->
+        <div class="col-md-1"></div>
+
+        <!-- Top Articles List Section -->
+        <div class="col-lg-6 col-md-5 bg-light p-4 rounded">
+            <h2 class="text-center mb-4">Top Articles</h2>
+            @if (Model.TopArticles != null && Model.TopArticles.Any())
+            {
+                <ul class="list-unstyled">
+                    @foreach (var article in Model.TopArticles.Select((value, index) => new { value, index }))
+                    {
+                        <li class="d-flex align-items-center mb-3">
+                            <span class="me-3 text-black fw-bold">@(article.index + 1)</span>
+                            <a href="@Url.Action("Detail", new { id = article.value.ArticleID })" class="text-dark text-decoration-none">@article.value.Title</a>
+                            <p class="ms-2 text-muted">(Favorites: @article.value.TotalFavorites)</p>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>No top articles available.</p>
+            }
+        </div>
+    </div>
+
+    <div class="my-5"></div>
+
+
+    <div class="row">
+        <h2 class="text-center mb-4">Article Category</h2>
+
+        @if (data != null && data.Any())
+        {
+            @foreach (var category in data)
+            {
+                <!-- Tên danh mục -->
+                <div class="row mb-5">
+                    <div class="col-12">
+                        <h3 class="font-weight-bold">@category.CategoryName</h3>
+                    </div>
+
+                    <!-- Bài viết nổi bật nhất (có nhiều lượt thích nhất) -->
+                    <div class="col-lg-5 col-md-6 mb-4">
+                        @if (category.FeatureArticle != null)
+                        {
+                            <div class="card shadow-sm border-0">
+                                <img src="@($"{url}/images/{category.FeatureArticle.MainImage}")" alt="Feature Article Image" class="card-img-top">
+                                <div class="card-body">
+                                    <p class="text-muted">@category.FeatureArticle.CreatedAt.ToString("dd/MM/yyyy hh:mm:ss")</p>
+                                    <h3 class="card-title">
+                                        <a href="@Url.Action("Detail", new { id = category.FeatureArticle.ArticleID })" class="text-dark">@category.FeatureArticle.Title</a>
+                                    </h3>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <p>No featured article available in this category.</p>
+                        }
+                    </div>
+
+                    <!-- Danh sách các bài viết mới nhất -->
+                    <div class="col-lg-6 col-md-5">
+                        <h3 class="font-italic">Latest Articles</h3>
+
+                        @if (category.LastedArticles != null && category.LastedArticles.Any())
+                        {
+                            @foreach (var article in category.LastedArticles)
+                            {
+                                <div class="card mb-3 border-0 shadow-sm">
+                                    <div class="row g-0">
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <p class="text-muted mb-2">@article.CreatedAt.ToString("dd/MM/yyyy hh:mm:ss")</p>
+                                                <h4 class="card-title">
+                                                    <a href="@Url.Action("Detail", new { id = article.ArticleID })" class="text-dark text-decoration-none">@article.Title</a>
+                                                </h4>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <img src="@($"{url}/images/{article.MainImage}")" alt="Article Image" class="img-fluid rounded-end">
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p>No latest articles available in this category.</p>
+                        }
+                    </div>
+                </div>
+
+                <hr />
+            }
+        }
+        else
+        {
+            <p>No data available.</p>
+        }
+    </div>
+
+
+
+</div>
+
+<div class="my-5"></div>
+
+<div class="container">
+    <!-- Meet Our Residents Section -->
+    <div class="text-center mb-5">
+        <h1 class="page-title">Meet Our Residents</h1>
+        <p class="description">The ultimate dream team—our residents will share everything you've ever wanted to know about dinner-wrangling, dessert-whispering, and more.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        @foreach (var item in admins)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="profile-card text-center">
+                    <img src=@(item.Avatar!=null? url+"images/"+item.Avatar: "~/images/profile.jpg") alt="Resident" class="profile-image rounded-circle">
+                    <div class="info-box mt-3">
+                        <p class="username">@item.Fullname</p>
+                        <a href="/account/userinfo/@item.Id" class="btn btn-outline-secondary btn-sm">View Profile</a>
+                    </div>
+                </div>
+            </div>
+        }
+       
+    </div>
+</div>
+
+
+<!-- CSS Styling -->
+<style>
+    .recipe-image {
+        object-fit: cover;
+        height: 300px;
+    }
+
+    .latest-recipe-image {
+        width: 100%;
+        height: auto;
+    }
+
+    /* Articles List Styling */
+    .ChuLi {
+        padding-left: 0;
+        list-style: none;
+    }
+
+        .ChuLi li {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 10px;
+        }
+
+            .ChuLi li span {
+                font-weight: bold;
+                width: 30px;
+                margin-right: 10px;
+            }
+
+    /* Profile Section */
+    .profile-card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-image {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .info-box {
+        background-color: #F7F7F7;
+        padding: 10px;
+        border-radius: 4px;
+    }
+
+    .username {
+        color: #333;
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .view-profile {
+        color: #998675;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+    }
+</style>

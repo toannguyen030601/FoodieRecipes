@@ -1,0 +1,163 @@
+﻿@model GetArticleDTO
+@using FoodieHub.MVC.Models.Article
+@using FoodieHub.MVC.Service.Interfaces
+@inject IConfiguration config
+@inject ICommentService commentService
+@inject IFavoriteService favoriteService;
+
+@{
+    ViewData["Title"] = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var url = config["BaseHost"];
+    var comments = await commentService.GetCommentArticle(Model.ArticleID);
+    var listFavorites = await favoriteService.GetFA() ?? new List<GetArticleDTO>();
+    var userID = ViewBag.UserID ?? "";
+}
+
+<div class="container">
+    <div class="row">
+        <p class="mt-3">Article / @Model.CategoryName</p>
+        <div class="col-md-12 text-center my-2">
+            <h2 class="mb-3">@Model.Title</h2>
+            <p><strong>By:</strong> @Model.FullName | <strong>@Model.CreatedAt</strong></p>
+            <a href="#reviews">View @Model.TotalComments comments</a>
+        </div>
+
+        <div class="col-md-6">
+            <img src="@($"{url}/images/{Model.MainImage}")" alt="Article" class="img-fluid mb-3">
+
+            <p>@Html.Raw(@Model.Description)</p>
+        </div>
+
+        <div class="col-md-6">
+            <div class="col-12 d-flex align-items-center mb-1">
+                @if (listFavorites.Select(x => x.ArticleID).Contains(Model.ArticleID))
+                {
+                    <a asp-action="UnFavorite" asp-route-id="@Model.ArticleID" class="btn btn-outline-secondary">
+                        <i class="fas fa-bookmark"></i> UnSave
+                    </a>
+                }
+                else
+                {
+                    <a asp-action="Favorite" asp-route-id="@Model.ArticleID" class="btn btn-outline-secondary">
+                        <i class="far fa-bookmark"></i> Save
+                    </a>
+                }
+                <span class="ms-2"> @Model.TotalFavorites Favorites</span>
+            </div>
+            <hr>
+            <div class="recipe-by">
+                <div class="recipe-by-info">
+                    <p class="mb-0"><strong>Recipe By: <br></strong>
+                        @if (Model.Avatar != null)
+                        {
+                            <img src="@($"{url}images/{Model.Avatar}")" alt="User Image" class="rounded-circle me-3" style="width:50px;height:50px">
+                        }
+                        else
+                        {
+                            <img src="/images/profile.jpg" alt="User Image" class="rounded-circle me-3" style="width:50px;height:50px">
+                        }
+                        @Model.FullName
+                        </p>
+                </div>
+                <a href=@("/account/userinfo/"+Model.UserID) class="btn btn-outline-secondary">View Profile</a>
+            </div>
+        </div>
+    </div>
+    <hr>
+
+    <!-- Reviews Section -->
+    <div id="reviews" class="mt-5 col-12 col-md-6">
+        <!-- Create Comment Form -->
+        <form asp-action="CreateComment" method="post" class="mb-4">
+            <div class="d-flex justify-content-between">
+                <h5>REVIEWS (@comments.Count())</h5>
+                <button type="submit" class="button button-dark">Submit Review</button>
+            </div>
+            <input type="hidden" name="ArticleID" value="@Model.ArticleID" />
+            <textarea name="CommentContent" required class="form-control me-2" rows="2" placeholder="Enter a Review"></textarea>
+        </form>
+
+        <!-- Comments List -->
+        <div id="commentsList">
+            @foreach (var comment in comments)
+            {
+                <div class="d-flex align-items-center mb-4 bg-light p-3 rounded shadow-sm position-relative">
+                    @if (comment.Avatar != null)
+                    {
+                        <img src="@($"{url}images/{comment.Avatar}")" alt="Avatar" class="rounded-circle me-3" style="width:50px;height:50px">
+                    }
+                    else
+                    {
+                        <img src="/images/profile.jpg" alt="Avatar" class="rounded-circle me-3" style="width:50px;height:50px">
+                    }
+                    <div>
+                        <p class="mb-1"><strong>@comment.FullName</strong> - @comment.CommentedAt.ToString("dd/MM/yyyy HH:mm:ss")</p>
+                        <p class="mb-0">@comment.CommentContent</p>
+                    </div>
+
+                    @if (comment.UserID == userID)
+                    {
+                        <!-- Dropdown menu for Edit and Delete -->
+                        <div class="dropdown ms-auto position-absolute top-0 end-0 me-3">
+                            <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-ellipsis-vertical"></i><!-- Bootstrap icon for three dots -->
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li>
+                                    <button class="dropdown-item" onclick="openEditModal('@comment.CommentID', '@comment.CommentContent',@Model.ArticleID)">Edit</button>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-danger" asp-action="DeleteComment" asp-route-articleID="@Model.ArticleID" asp-route-id="@comment.CommentID">Delete</a>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@* <!-- Modal --> *@
+<div class="modal fade" id="editCommentModal" tabindex="-1" aria-labelledby="editCommentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCommentModalLabel">Edit Comment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-action="EditComment" id="editCommentForm">
+                    <input type="hidden" name="CommentID" id="editCommentID">
+                    <input type="hidden" name="ArticleID" id="articleID">
+                    <div class="form-group">
+                        <label for="editCommentContent">Comment</label>
+                        <textarea required class="form-control" name="CommentContent" id="editCommentContent" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary" form="editCommentForm">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+     function openEditModal(commentID, commentContent,articleID) {
+        // Set values in the modal
+        document.getElementById('editCommentID').value = commentID;
+        document.getElementById('editCommentContent').value = commentContent;
+        document.getElementById('articleID').value = articleID;
+
+        // Show the modal
+        var editModal = new bootstrap.Modal(document.getElementById('editCommentModal'));
+        editModal.show();
+    }
+
+
+</script>

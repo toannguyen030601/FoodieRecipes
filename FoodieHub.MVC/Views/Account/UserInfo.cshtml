@@ -1,0 +1,172 @@
+﻿@using FoodieHub.MVC.Models.Article
+@using FoodieHub.MVC.Models.Recipe
+@using FoodieHub.MVC.Models.User
+@using System.Text.Json
+@model UserDTO
+@inject IConfiguration config;
+
+@{
+    ViewData["Title"] = "UserInfo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var url = config["BaseHost"];
+    var recipes = ViewBag.RecipeData as IEnumerable<GetRecipeDTO> ?? new List<GetRecipeDTO>();
+    var articles = ViewBag.ArticleData as IEnumerable<GetArticleDTO> ?? new List<GetArticleDTO>();
+}
+
+
+<div class="container my-5">
+    <!-- Profile Section -->
+    <div class="profile-header text-center mb-5">
+        @if(Model.Avatar!=null){
+            <img src=@(url + "images/" + Model.Avatar) class="rounded-circle mb-3" alt="Profile Picture">
+        }
+        else {
+            <img src="~/images/profile.jpg" class="rounded-circle mb-3" alt="Profile Picture">
+        }
+        <h2>@Model.Fullname</h2>
+        <p class="text-muted">Member since @Model.JoinedAt</p>
+        <p class="text-muted">Bio: @Html.Raw(Model.Bio)</p>
+       
+    </div>
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs justify-content-center mb-4" id="profileTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="recipes-tab" data-bs-toggle="tab" data-bs-target="#recipes" type="button" role="tab" aria-controls="recipes" aria-selected="true">
+                <strong>@recipes.Count()</strong> Recipes
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="following-tab" data-bs-toggle="tab" data-bs-target="#articles" type="button" role="tab" aria-controls="following" aria-selected="false">
+                <strong>@articles.Count()</strong> Article
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="profileTabsContent">
+
+        <!-- Recipes Tab -->
+        <div class="tab-pane fade show active" id="recipes" role="tabpanel" aria-labelledby="recipes-tab">
+            <div class="row">
+                @if (recipes.Count() > 0)
+                {
+                    foreach (var item in recipes)
+                    {      
+                        <div class="col-lg-3 col-md-4 col-6 mb-4">
+                            <a href="/recipes/detail/@item.RecipeID">
+                                <div class="card h-100">
+                                    <img src="@(url + "images/" + item.ImageURL)" class="card-img-top" alt="Recipe Image">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">@item.Title</h5>
+                                        <p>@item.CreatedAt</p>
+                                    </div>
+                                </div>
+                            </a>                          
+                        </div>                     
+                    }
+                }
+                else
+                {
+                    <p>No recipes found.</p>
+                }
+            </div>
+        </div>
+
+
+        <!-- Articles Tab -->
+        <div class="tab-pane fade show" id="articles" role="tabpanel" aria-labelledby="recipes-tab">
+            <div class="row">
+                @if (articles.Count() > 0)
+                {
+                    foreach (var item in articles)
+                    {
+                        <div class="col-lg-3 col-md-4 col-6 mb-4">
+                            <a href="/recipes/detail/@item.ArticleID">
+                                <div class="card h-100">
+                                    <img src="@(url + "images/" + item.MainImage)" class="card-img-top" alt="Article Image">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">@item.Title</h5>
+                                        <p>@item.CreatedAt</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>No article found.</p>
+                }
+            </div>
+        </div>
+        
+
+
+    </div>
+</div>
+
+
+<!-- CSS Styling -->
+<style>
+    .profile-header img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #343a40;
+    }
+
+    .nav-tabs .nav-link {
+        color: #fff;
+        background-color: #495057;
+        border-radius: 0.25rem;
+        font-weight: bold;
+    }
+
+        .nav-tabs .nav-link.active {
+            background-color: #adb5bd;
+            color: #000;
+        }
+
+    .card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+    .card-title {
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .rating {
+        color: #ffc107;
+    }
+
+    .user-img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .button-outline-dark {
+        border-color: #343a40;
+        color: #343a40;
+    }
+
+        .button-outline-dark:hover {
+            background-color: #343a40;
+            color: #fff;
+        }
+
+    .save-button, .unfollow-button {
+        margin-top: 10px;
+    }
+</style>

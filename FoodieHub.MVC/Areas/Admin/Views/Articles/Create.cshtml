@@ -1,0 +1,60 @@
+﻿@using FoodieHub.MVC.Models.Article
+@using FoodieHub.MVC.Service.Interfaces
+@inject IArticleCategoryService service
+@{
+    ViewData["Title"] = "Create Article";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var categories = await service.GetAll();
+}
+@model CreateArticleDTO
+<div class="container py-4">
+    <h2 class="text-primary">Create New Article</h2>
+
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label">Title</label>
+            <input asp-for="Title" class="form-control" placeholder="Enter article title" />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="File" class="form-label">Image</label>
+            <input type="file" asp-for="File" class="form-control" accept="image/*" />
+            <span asp-validation-for="File" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            
+            <label asp-for="Description" class="form-label me-5">Description</label>
+            <span asp-validation-for="Description" class="text-danger"></span>
+            <textarea class="form-control" asp-for="Description" placeholder="Enter article description"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="IsActive" class="form-label">IsActive</label>
+            <select asp-for="IsActive" class="form-select form-select-sm me-2" style="width: 150px;">
+                <option value="true">True</option>
+                <option value="false">False</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="CategoryID" class="form-label me-3">Category</label>
+            <span asp-validation-for="CategoryID" class="text-danger"></span>
+            <select asp-for="CategoryID" class="form-select form-select-sm me-2" style="width: 150px;">
+                <option value="" selected>All</option>
+                @if (categories != null)
+                {
+                    foreach (var item in categories)
+                    {
+                        <option value="@item.CategoryID">@item.CategoryName</option>
+                    }
+                }
+            </select>
+           
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Article</button>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </form>
+</div>

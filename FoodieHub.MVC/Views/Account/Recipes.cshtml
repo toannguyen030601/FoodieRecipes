@@ -1,0 +1,242 @@
+﻿@using FoodieHub.MVC.Models.Recipe
+@inject IConfiguration config;
+
+@{
+    ViewData["Title"] = "Profile User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var url = config["BaseHost"];
+}
+@{
+    var recipes = ViewBag.Recipes as IEnumerable<GetRecipeDTO> ?? new List<GetRecipeDTO>();
+    var publishRecipes = recipes.Where(x => x.IsActive);
+    var draftRecipes = recipes.Where(x => !x.IsActive);
+}
+
+<link rel="stylesheet" href="~/css/profile.css">
+<div class="container py-5">
+    <div class="row align-items-start">
+        <div class="col-12">
+            <h5 class="text-center mb-4">Account / Recipes</h5>
+        </div>
+        @await Html.PartialAsync("_NavigationForProfile")
+
+        <!-- Main Content -->
+        <div class="col-md-8 profile-content mt-3">
+            <!-- Tab navigation -->
+            <ul class="nav nav-tabs mb-4" id="recipeTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="public-recipes-tab" data-bs-toggle="tab" href="#public-recipes" role="tab" aria-controls="public-recipes" aria-selected="true">Recipes</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="draft-recipes-tab" data-bs-toggle="tab" href="#draft-recipes" role="tab" aria-controls="draft-recipes" aria-selected="false">Drafts</a>
+                </li>
+                
+                <a href="/recipes/create" class="button button-dark ms-3">Share a Recipe</a>
+            </ul>
+
+            <div class="tab-content" id="recipeTabContent">
+                <!-- Public Recipes Tab -->
+                <div class="tab-pane fade show active" id="public-recipes" role="tabpanel" aria-labelledby="public-recipes-tab">
+                    <div class="row g-4">
+                        @foreach (var item in publishRecipes)
+                        {
+                            <div class="col-12 col-md-4">
+                                <div class="card recipe-card shadow-sm">
+                                    <a href="/recipes/detail/@item.RecipeID">
+                                        <img src=@(url+"images/"+item.ImageURL) class="card-img-top" alt="Recipe Image">
+                                    </a>
+                                    <div class="card-body">
+                                        <h5 class="card-title">@item.Title</h5>
+                                
+                                        <div class="recipe-stats">
+                                            <span>Created on: @item.CreatedAt</span>
+                                            <span>Likes: @item.TotalFavorites</span>
+                                        </div>
+                                        <div class="recipe-stats">
+                                            <span>Rating: @item.RatingAverage/5</span>
+                                            <span>Comments: @item.TotalComments</span>
+                                        </div>
+                                        <!-- Menu Options -->
+                                        <div class="dropdown position-absolute top-0 end-0 p-2">
+                                            <button class="btn btn-link text-dark" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="/recipes/edit/@item.RecipeID">Edit</a></li>
+                                                <li>
+                                                    <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                       onclick="document.getElementById('deleteForm').action = '/recipes/delete/' + '@item.RecipeID'">
+                                                        Delete
+                                                    </a>
+                                                </li>
+                                              
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                       
+                    </div>
+                </div>
+
+                <!-- Draft Recipes Tab -->
+                <div class="tab-pane fade" id="draft-recipes" role="tabpanel" aria-labelledby="draft-recipes-tab">
+                    <div class="row g-4">
+                        @foreach (var item in draftRecipes)
+                        {
+                            <div class="col-12 col-md-4">
+                                <div class="card recipe-card shadow-sm">
+                                    <img src="@($"{url}images/{item.ImageURL}")" class="card-img-top" alt="Recipe Image">
+                                    <div class="card-body">
+                                        <h5 class="card-title">@item.Title</h5>      
+                                        <div class="recipe-stats">
+                                            <span>Created on: @item.CreatedAt</span>
+                                            <span>Likes: @item.TotalFavorites</span>
+                                        </div>
+                                        <div class="recipe-stats">
+                                            <span>Rating: @item.RatingAverage/5 (@item.TotalRatings)</span>
+                                            <span>Comments: @item.TotalComments</span>
+                                        </div>
+                                        <!-- Menu Options -->
+                                        <div class="dropdown position-absolute top-0 end-0 p-2">
+                                            <button class="btn btn-link text-dark" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="/recipes/edit/@item.RecipeID">Edit</a></li>
+                                                <li>
+                                                    <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                       onclick="document.getElementById('deleteForm').action = '/recipes/delete/' + '@item.RecipeID'">
+                                                        Delete
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                   
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xác Nhận Dùng Chung -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this item? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                <!-- Nút Xóa -->
+                <form id="deleteForm" method="post">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        let selectedRecipeID = null;
+
+        function setRecipeID(recipeID) {
+            selectedRecipeID = recipeID;
+        }
+    </script>
+}
+
+<!-- CSS Styling -->
+<style>
+    .recipe-card {
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        position: relative;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .recipe-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .recipe-card .card-body {
+            padding: 20px;
+        }
+
+        .recipe-card .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .recipe-card .card-text {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+    .recipe-stats {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        color: #777;
+        margin-top: 10px;
+    }
+
+    .profile-content h3 {
+        font-size: 1.5rem;
+        color: #333;
+        font-weight: bold;
+        border-bottom: 2px solid #8FD14F;
+        padding-bottom: 5px;
+        margin-bottom: 15px;
+    }
+
+    .profile-content {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .text-center {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .nav-tabs .nav-link {
+        font-size: 1rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+        .nav-tabs .nav-link.active {
+            background-color: #8FD14F;
+            color: #fff;
+        }
+
+    .shadow-sm {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    }
+</style>

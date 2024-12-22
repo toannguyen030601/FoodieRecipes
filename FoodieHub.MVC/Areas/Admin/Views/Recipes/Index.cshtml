@@ -1,0 +1,202 @@
+﻿@using FoodieHub.MVC.Models.Recipe
+@using FoodieHub.MVC.Models.QueryModel
+@using FoodieHub.MVC.Models.Response
+@using FoodieHub.MVC.Service.Interfaces
+@inject IRecipeCategoryService category
+@inject IConfiguration config
+@{
+    ViewData["Title"] = "Recipes";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var url = config["BaseHost"];
+    var categories = await category.GetAll();
+    var query = ViewBag.Query as QueryRecipeModel ?? new QueryRecipeModel();
+}
+@model PaginatedModel<GetRecipeDTO>
+
+<div class="container py-4">
+    <!-- Header Section with Create Button, Filter, Search, and Total Count -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <a href="recipes/create" class="btn btn-primary">Create</a>
+        </div>
+
+        <form method="post" class="d-flex align-items-center">
+            <a class="btn btn-light me-2" asp-action="Index">Clear All Filter</a>
+            <label for="IsActive" class="me-2">IsActive</label>
+            <select name="IsActive" class="form-select form-select-sm me-2" style="width: 150px;">            
+                @if (query.IsActive != null)
+                {    
+                    if(query.IsActive==true){
+                        <option value="">All</option>
+                        <option selected value="true">Active</option>
+                        <option value="false">Deactive</option>
+                    }
+                    else
+                    {
+                        <option value="">All</option>
+                        <option value="true">Active</option>
+                        <option selected value="false">Deactive</option>
+                    }
+                }
+                else
+                {
+                    <option selected value="">All</option>
+                    <option value="true">Active</option>
+                    <option value="false">Deactive</option>
+                }
+
+            </select>
+            <label for="CategoryID" class="me-2">Category Name</label>
+            <select name="CategoryID" class="form-select form-select-sm me-2" style="width: 150px;">
+                <option value="" selected>All</option>
+                @if (categories != null)
+                {
+                    foreach (var item in categories)
+                    {
+                        @if(query.CategoryID==item.CategoryID){
+                            <option selected value=@item.CategoryID>@item.CategoryName</option>
+                        }
+                        else{
+                            <option value=@item.CategoryID>@item.CategoryName</option>
+                        }
+                       
+                    }
+                }
+            </select>
+            <input type="text" name="SearchItem" value=@query.SearchItem class="form-control form-control-sm me-2" placeholder="Search articles..." style="width: 200px;" />
+            <button type="submit" class="btn btn-secondary">Search</button>
+        </form>
+    </div>
+
+    <!-- Total Count of recipes -->
+    <div class="mb-3">
+        <strong>Total Recipes: </strong>@(Model != null ? Model.TotalItems : 0)
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>RecipeID</th>
+                    <th>Title</th>
+                    <th>Image</th>
+                    <th>Created At</th>
+                    <th>Author</th>
+                    <th>Category</th>
+                    <th>IsActive</th>
+                    <th>Upload By</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>               
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.RecipeID</td>
+                        <td>@item.Title</td>
+                        <td><img src=@($"{url}images/{item.ImageURL}") alt="Recipe Image" class="img-thumbnail" style="width:50px;height:50px" /></td>
+                        <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>
+                        <td>@item.FullName</td>
+                        <td>@item.CategoryName</td>
+                        <td>@item.IsActive</td>
+                        <td>
+                            @{
+                                var result = item.IsAdminUpload ? "Admin" : "User";
+                                <span>@result</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Detail" asp-route-id="@item.RecipeID" class="btn btn-info btn-sm">Detail</a>
+                            <a asp-action="Edit" asp-route-id="@item.RecipeID" class="btn btn-warning btn-sm">Edit</a>
+                            <a class="btn btn-danger btn-sm" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                               onclick="document.getElementById('deleteForm').action = 'recipes/delete/' + '@item.RecipeID'">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <form method="get" class="d-flex justify-content-between align-items-center mt-3">
+        <!-- Select box for page size -->
+        <div>
+            <select name="pageSize" class="form-select form-select-sm" style="width: 70px;" onchange="this.form.submit()">
+                @for (int i = 2; i <= 20; i += 2)
+                {
+                    if (Model.PageSize == i)
+                    {
+                        <option value="@i" selected>@i</option>
+                    }
+                    else
+                    {
+                        <option value="@i">@i</option>
+                    }
+
+                }
+            </select>
+        </div>
+
+        <!-- Pagination navigation -->
+        <nav aria-label="Page navigation example">
+            <ul class="pagination pagination-sm mb-0">
+                <!-- Nút Previous (ẩn nếu đang ở trang đầu tiên) -->
+                <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-route-pageSize="@Model.PageSize" asp-route-Page="@(Model.Page - 1)">Previous</a>
+                </li>
+
+                <!-- Tạo danh sách các trang -->
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                        <a class="page-link" asp-route-pageSize="@Model.PageSize" asp-route-Page="@i">@i</a>
+                    </li>
+                }
+
+                <!-- Nút Next (ẩn nếu đang ở trang cuối) -->
+                <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-route-pageSize="@Model.PageSize" asp-route-Page="@(Model.Page + 1)">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </form>
+</div>
+<!-- Modal Xác Nhận Dùng Chung -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this item? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                <!-- Nút Xóa -->
+                <form id="deleteForm" method="post">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #f5f9ff;
+    }
+
+    h2 {
+        color: #2c3e50;
+    }
+
+    .table-bordered th, .table-bordered td {
+        vertical-align: middle;
+    }
+</style>

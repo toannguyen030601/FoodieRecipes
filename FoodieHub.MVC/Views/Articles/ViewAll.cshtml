@@ -1,0 +1,211 @@
+﻿@{
+    ViewData["Title"] = "ViewAll";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using FoodieHub.MVC.Models.Article
+@using FoodieHub.MVC.Models.DTOs
+@using FoodieHub.MVC.Models.QueryModel
+@using FoodieHub.MVC.Models.Response
+@using FoodieHub.MVC.Service.Interfaces
+@model PaginatedModel<GetArticleDTO>
+@inject IConfiguration Configuration
+@{
+    var apiUrl = "";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 sidebar-profile">
+            <h5>Filter By:</h5>
+            <form id="filterForm" method="get" asp-action="ViewAll">
+                <div class="mb-3">
+                    <select name="CategoryID" class="form-select">
+                        <option value="">Filter by Category</option>
+                        @if (ViewBag.Categories != null)
+                        {
+                            foreach (var item in ViewBag.Categories)
+                            {
+                                if (ViewBag.Query.CategoryID == item.CategoryID)
+                                {
+                                    <option selected value="@item.CategoryID">@item.CategoryName</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.CategoryID">@item.CategoryName</option>
+                                }
+                            }
+                        }
+                    </select>
+
+                </div>
+                <!-- Sort by Dropdown -->
+                <div class="mb-3">
+                    <select name="SortBy" class="form-select">
+                        @if (ViewBag.Query.SortBy == "CreatedAt")
+                        {
+                            <option value="CreatedAt" selected>Sort by Date</option>
+                        }
+                        else
+                        {
+                            <option value="CreatedAt">Sort by Date</option>
+                        }
+
+                        @if (ViewBag.Query.SortBy == "TotalFavorites")
+                        {
+                            <option value="TotalFavorites" selected>Sort by Likes</option>
+                        }
+                        else
+                        {
+                            <option value="TotalFavorites">Sort by Likes</option>
+                        }
+                    </select>
+
+                </div>
+            </form>
+        </div>
+
+        <!-- Products Column -->
+        <div class="col-md-9">
+            <!-- Phần đếm sản phẩm và sắp xếp -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="product-count text-primary">Total @Model.TotalItems bài viết</div>
+                <div class="d-flex align-items-center sort-by text-primary">
+                    <span>Sort by:</span>
+                    <div class="dropdown ms-2">
+                        <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <strong class="text-secondary">
+                                @((ViewData["SortOrder"].ToString() == "asc") ? "A to Z" : ViewData["SortOrder"].ToString() == "desc" ? "Z to A" : "By Likes")
+                            </strong> <i class="bi bi-chevron-down"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("ViewAll", new { sortOrder = "asc", category = ViewData["SelectedCategory"], currentPage = 1 })">Name: A to Z</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("ViewAll", new { sortOrder = "desc", category = ViewData["SelectedCategory"], currentPage = 1 })">Name: Z to A</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="@Url.Action("ViewAll", new { sortOrder = "likes", category = ViewData["SelectedCategory"], currentPage = 1 })">By Likes</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="row g-3">
+                @if (Model.Items.Any())
+                {
+                    @foreach (var item in Model.Items)
+                    {
+                        <div class="col-md-4">
+                            <div class="product-card p-3 shadow-sm">
+                                <img src="@($"{apiUrl}Images/{item.MainImage}")" alt="Product Image" class="product-image">
+                                <!-- Tiêu đề liên kết tới trang Detail -->
+                                <h6 class="mt-3">
+                                    <a asp-action="Detail" asp-controller="Articles" asp-route-id="@item.ArticleID" class="text-dark text-decoration-none">
+                                        @item.Title
+                                    </a>
+                                </h6>
+                                <!-- Hiển thị tổng lượt thích và bình luận -->
+                                <div class="text-muted small">
+                                    <span>@item.TotalFavorites Favorites</span> •
+                                    <span>@item.TotalComments Comments</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>Không có bài viết nào cho danh mục này.</p>
+                }
+            </div>
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation example">
+                <ul class="pagination pagination-sm mb-0">
+                    <!-- Nút Previous (ẩn nếu đang ở trang đầu tiên) -->
+                    <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-route-pageSize="@Model.PageSize" asp-route-currentPage="@(Model.Page - 1)">Previous</a>
+                    </li>
+
+                    <!-- Tạo danh sách các trang -->
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.Page ? "active" : "")">
+                            <a class="page-link" asp-route-pageSize="@Model.PageSize" asp-route-currentPage="@i">@i</a>
+                        </li>
+                    }
+
+                    <!-- Nút Next (ẩn nếu đang ở trang cuối) -->
+                    <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-route-pageSize="@Model.PageSize" asp-route-currentPage="@(Model.Page + 1)">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    /* CSS cho phần giao diện */
+    .product-card {
+        background-color: #fff;
+        border-radius: 10px;
+        border: 1px solid #eaeaea;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+        .product-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+    .product-image {
+        width: 100%;
+        height: 200px;
+        border-radius: 8px;
+    }
+
+    .filters {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        color: #333;
+    }
+
+    .pagination a {
+        color: #444;
+        padding: 8px 12px;
+        margin: 0 4px;
+        border-radius: 4px;
+        text-decoration: none;
+        border: 1px solid #ddd;
+    }
+
+        .pagination a.active, .pagination a:hover {
+            background-color: #869FAE;
+            color: #fff;
+        }
+
+    .product-count, .sort-by {
+        font-size: 1rem;
+        color: #555;
+    }
+
+        .sort-by span {
+            margin-right: 8px;
+        }
+
+    /* Căn trái label và căn phải radio button */
+    .d-flex.justify-content-between.align-items-center label {
+        flex-grow: 1;
+        text-align: left;
+    }
+
+    .d-flex.justify-content-between.align-items-center input[type="radio"] {
+        margin-left: auto;
+    }
+</style>

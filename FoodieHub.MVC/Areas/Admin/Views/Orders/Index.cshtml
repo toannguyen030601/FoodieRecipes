@@ -1,0 +1,207 @@
+﻿@using FoodieHub.MVC.Models.Order
+@using FoodieHub.MVC.Models.QueryModel
+@using FoodieHub.MVC.Models.Response
+@inject IConfiguration config;
+@model PaginatedModel<GetOrder>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var url = config["BaseHost"];
+    var query = ViewBag.Query as QueryOrderModel ?? new QueryOrderModel();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Order List</h2>
+    <form method="get" class="d-flex align-items-center gap-3 bg-light p-2 rounded">
+        <a class="btn btn-light me-3" asp-action="Index">Clear All Filter</a>
+
+        <!-- Filter by Date -->
+        <div class="d-flex align-items-center">
+            <label for="OrderDate" class="form-label me-2 font-weight-bold mb-0">Order Date:</label>
+            <input type="date" id="OrderDate" name="OrderDate" class="form-control" style="max-width: 200px;" value=@query.OrderDate />
+        </div>
+
+        <!-- Filter by Status -->
+        <div class="d-flex align-items-center">
+            <label for="Status" class="form-label me-2 font-weight-bold mb-0">Status:</label>
+            <select class="form-select" id="Status" name="Status" style="max-width: 150px;" onchange="this.form.submit()">
+                <option value="">All</option>
+                <option value="Pending" selected="@(query.Status == "Pending")">Pending</option>
+                <option value="Payed" selected="@(query.Status == "Payed")">Payed</option>
+                <option value="Approved" selected="@(query.Status == "Confirm")">Confirm</option>
+                <option value="Shipping" selected="@(query.Status == "Shipping")">Shipping</option>
+                <option value="Completed" selected="@(query.Status == "Completed")">Completed</option>
+                <option value="Canceled" selected="@(query.Status == "Canceled")">Canceled</option>
+            </select>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+</div>
+
+@if (!Model.Items.Any())
+{
+    <p>No orders available.</p>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>
+                    <a asp-action="Index"
+                       asp-route-SortBy="OrderedAt"
+                       asp-route-Ascending="@(query.Ascending?"false":"true")"
+                       asp-route-Page="@query.Page"
+                       asp-route-PageSize="@query.PageSize">
+                        Ordered At
+                        @(query.SortBy == "OrderedAt"
+                            ? (query.Ascending ? " ↓" : " ↑")
+                            : "")
+                    </a>
+                </th>
+                <th>Customer Name</th>
+                <th>
+                    <a asp-action="Index"
+                       asp-route-SortBy="TotalAmount"
+                       asp-route-Ascending="@(query.Ascending?"false":"true")"
+                       asp-route-Page="@query.Page"
+                       asp-route-PageSize="@query.PageSize">
+                        Total Amount
+                        @(query.SortBy == "TotalAmount"
+                            ? (query.Ascending ? " ↓" : " ↑")
+                            : "")
+                    </a>
+                </th>
+                <th>Status</th>
+                <th>Payment Method</th>
+                <th>Payment Status</th>
+                <th>Phone Number</th>
+                <th>QR Code</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model.Items)
+            {
+                <tr>
+                    <td>@order.OrderID</td>
+                    <td>@order.OrderedAt.ToString("dd/MM/yyyy")</td>
+                    <td>@order.Fullname</td>
+                    <td>$ @(order.TotalAmount - (order.Discount??0) - (order.DiscountOfCoupon??0))</td>
+                    <td>
+                        @{
+                            string status = order.Status.ToLowerInvariant();
+                            if (!string.IsNullOrEmpty(status))
+                            {
+                                status = char.ToUpper(status[0]) + status.Substring(1);
+                            }
+
+                            switch (status)
+                            {
+                                case "Pending":
+                                    <span class="badge bg-warning">@status</span>
+                                    break;
+                                case "Approved":
+                                    <span class="badge bg-success">@status</span>
+                                    break;
+                                case "Rejected":
+                                    <span class="badge bg-danger">@status</span>
+                                    break;
+                                case "Payed":
+                                    <span class="badge bg-success">@status</span>
+                                    break;
+                                case "Shipping":
+                                    <span class="badge bg-secondary">@status</span>
+                                    break;
+                                case "Completed":
+                                    <span class="badge bg-info">@status</span>
+                                    break;
+                                case "Canceled":
+                                    <span class="badge bg-danger-subtle">@status</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-primary-subtle">@status</span>
+                                    ; // or use a default badge if necessary
+                                    break;
+                            }
+                        }
+
+                    </td>
+                    <td>@(order.PaymentMethod ? "Card" : "Cash")</td>
+                    <td>@(order.PaymentStatus ? "Paid" : "Unpaid")</td>
+                    <td>@order.PhoneNumber</td>
+                    <td>
+                        <img src=@(url+"/"+order.QRCode) alt="QR Code" style="width: 50px; height: 50px;" />                      
+                    </td>
+                    <td>                   
+                        <a class="btn btn-primary" asp-action="Details" asp-route-id="@order.OrderID">Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-center">
+        <!-- Pagination -->
+        <form method="get" class="form-pagination d-flex justify-content-between align-items-center mt-3">
+            <!-- Hidden input to keep the current query values -->
+            <input type="hidden" name="SearchItem" value="@query.SearchItem" />
+            <input type="hidden" name="CategoryID" value="@query.Status" />
+            <input type="hidden" name="SortBy" value="@query.SortBy" />
+            <input type="hidden" name="OrderDate" value="@query.OrderDate" />
+            <input type="hidden" name="Page" value="@Model.Page" /> <!-- Hidden input to track the current page -->
+            <!-- Select box for page size -->
+            <div>
+                <select name="PageSize" class="form-select form-select-sm" style="width: 70px;" onchange="this.form.submit()">
+                    @for (int i = 2; i <= 20; i += 2)
+                    {
+                        @if (Model.PageSize == i)
+                        {
+                            <option value="@i" selected>@i</option>
+                        }
+                        else
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <!-- Pagination navigation -->
+            <nav aria-label="Page navigation example">
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                        <button type="button" class="page-link" onclick="changePage(@(Model.Page - 1))" @(Model.Page == 1 ? "disabled" : "")>
+                            Previous
+                        </button>
+                    </li>
+
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.Page ? "active" : "")">
+                            <button type="button" class="page-link" onclick="changePage(@i)">@i</button>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.Page == Model.TotalPages ? "disabled" : "")">
+                        <button type="button" class="page-link" onclick="changePage(@(Model.Page + 1))" @(Model.Page == Model.TotalPages ? "disabled" : "")>
+                            Next
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </form>
+    </div>
+}
+
+<script>
+    function changePage(page) {
+        const form = document.querySelector('.form-pagination'); // Select the pagination form by its class
+        form.querySelector('input[name="Page"]').value = page; // Set the page value
+        form.submit(); // Submit the form
+    }
+</script>
