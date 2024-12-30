@@ -66,7 +66,7 @@
             <div class="profile">
                 @if (Model.Avatar != null)
                 {
-                    <img src="@($"{url}images/{Model.Avatar}")" alt="User Image" class="rounded-circle me-3" style="width:50px;height:50px">
+                    <img src="@($"{url}images/{Model.Avatar}")" alt="User Image" class="rounded-circle me-3" style="width:50px;height:50px; object-fit: cover;">
                 }
                 else
                 {
@@ -205,7 +205,7 @@
                     @for (int i = 0; i < ViewBag.RelatedRecipes.Count; i += 3)
                     {
                         <div class="carousel-item @(i == 0 ? "active" : "")">
-                            <div class="row fw-bold">
+                            <div class="row">
                                 @for (int j = i; j < i + 3 && j < ViewBag.RelatedRecipes.Count; j++)
                                 {
                                     var recipe = ViewBag.RelatedRecipes[j];
@@ -232,7 +232,7 @@
 
                                             <div class="card-more-delicious-item-footer">
                                                 <div class="author">
-                                                    <img alt="avatar" src="@($"{url}images/{recipe.Avatar}")" height="30" width="30" />
+                                                    <img alt="avatar" src="@($"{url}images/{recipe.Avatar}")" height="30" width="30" style="object-fit: cover;" />
                                                     <span>@recipe.FullName</span>
                                                 </div>
                                                 <div class="rating">
@@ -265,7 +265,7 @@
     <hr class="my-5">
 
     <!-- Reviews Section -->
-    <div id="reviews" class="mt-5">
+    <div id="reviews" class="m-3">
         <!-- Create Comment Form -->
         <form asp-action="CreateComment" method="post" class="mb-4">
             <div class="d-flex justify-content-between">
@@ -283,11 +283,11 @@
                 <div class="d-flex align-items-center mb-4 bg-light p-3 rounded shadow-sm position-relative">
                     @if (comment.Avatar != null)
                     {
-                        <img src="@($"{url}images/{comment.Avatar}")" alt="Avatar" class="rounded-circle me-3" style="width:50px;height:50px">
+                        <img src="@($"{url}images/{comment.Avatar}")" alt="Avatar" class="rounded-circle me-3" style="width:30px;height:30px; object-fit: cover;">
                     }
                     else
                     {
-                        <img src="/images/profile.jpg" alt="Avatar" class="rounded-circle me-3" style="width:50px;height:50px">
+                        <img src="/images/profile.jpg" alt="Avatar" class="rounded-circle me-3" style="width:30px;height:30px">
                     }
                     <div>
                         <p class="mb-1"><strong>@comment.FullName</strong> - @comment.CommentedAt.ToString("dd/MM/yyyy HH:mm:ss")</p>
@@ -315,15 +315,15 @@
             }
         </div>
 
-        <div class="d-flex align-items-center justify-content-between">
-            <p class="rating-text" id="ratingText">Hover over the stars to rate</p>
-            <div class="star-rating mb-2">
-                <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 1 })" class="star" data-value="1">★</a>
-                <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 2 })" class="star" data-value="2">★</a>
-                <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 3 })" class="star" data-value="3">★</a>
-                <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 4 })" class="star" data-value="4">★</a>
-                <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 5 })" class="star" data-value="5">★</a>
-            </div>
+        <div class="text-center">
+            <span class="rating-text" id="ratingText">Hover over the stars to rate</span>
+        </div>
+        <div class="d-flex star-rating justify-content-center">
+            <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 1 })" class="star" data-value="1">★</a>
+            <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 2 })" class="star" data-value="2">★</a>
+            <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 3 })" class="star" data-value="3">★</a>
+            <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 4 })" class="star" data-value="4">★</a>
+            <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 5 })" class="star" data-value="5">★</a>
         </div>
 
     </div>
