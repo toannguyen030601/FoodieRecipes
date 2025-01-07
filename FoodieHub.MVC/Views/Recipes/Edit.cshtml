@@ -9,30 +9,12 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     var url = config["BaseHost"];
     var categories = await categoryService.GetAll() ?? new List<GetRecipeCategoryDTO>();
-    List<string> units = new List<string>
-{
-    "Gam (g)",
-    "Kilôgam (kg)",
-    "Lạng",
-    "Miligam (mg)",
-    "Mililit (ml)",
-    "Lít (l)",
-    "Muỗng cà phê (tsp)",
-    "Muỗng canh (tbsp)",
-    "Chén (cốc)",
-    "Bát",
-    "Quả",
-    "Củ",
-    "Miếng",
-    "Nắm",
-    "Bó",
-    "Thìa nhỏ",
-    "Thìa lớn",
-    "Tép",
-    "Gói",
-    "Lon"
-};
-    var products = await productService.GetAll();
+    List<string> units = new List<string>{
+    "Gam (g)","Kilôgam (kg)","Lạng","Miligam (mg)","Mililit (ml)",
+    "Lít (l)","Muỗng cà phê (tsp)","Muỗng canh (tbsp)","Chén (cốc)","Bát",
+    "Quả","Củ","Miếng","Nắm","Bó","Thìa nhỏ","Thìa lớn","Tép","Gói","Lon"};
+
+    var products = await productService.GetAll() ?? new List<GetProductDTO>();
 }
 
 @model UpdateRecipeDTO
@@ -227,7 +209,6 @@
 </style>
 
 @section Scripts {
-    @* <script src="https://cdn.tiny.cloud/1/9f10nl2sixdjnsjgfzvjpzp47s6ffwrlzte370p7cbbhk682/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script> *@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
     <script>
@@ -245,42 +226,17 @@
                 ]
             });
         });
-        //tinymce
-        tinymce.init({
-            selector: 'textarea',
-            plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
-            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
-        });
-        function addStep() {
-            var table = document.getElementById('stepsTable').getElementsByTagName('tbody')[0];
-            var rowCount = table.rows.length;
-            var row = table.insertRow(rowCount);
-
-            row.innerHTML = `
-                <td><input name="RecipeSteps[${rowCount}].Step" class="form-control" /></td>
-                <td><textarea name="RecipeSteps[${rowCount}].Directions" class="form-control"></textarea></td>
-                <td><input name="RecipeSteps[${rowCount}].FileStep" type="file" class="form-control" /></td>
-                <td><button type="button" class="btn btn-danger" onclick="removeStep(this)">Delete</button></td>`;
-
-            $(`textarea[name='RecipeSteps[${rowCount}].Directions']`).summernote();
-        }
-
-        function removeStep(button) {
-            var row = button.closest('tr');
-            row.parentNode.removeChild(row);
-        }
-
-         const units = @Html.Raw(Json.Serialize(units));
+        var units = @Html.Raw(Json.Serialize(units));
 
         let products = @Html.Raw(Json.Serialize(products)); // Lấy danh sách sản phẩm từ Razor view
 
-                document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             // Attach keyup event to all existing ingredient input fields on page load
             const ingredientCount = @Model.Ingredients.Count();
             for (let i = 0; i < ingredientCount; i++) {
                 const ingredientInput = document.getElementById(`ingredient-${i}`);
                 if (ingredientInput) {
-                    ingredientInput.addEventListener('keyup', function() {
+                    ingredientInput.addEventListener('keyup', function () {
                         searchIngredient(i);
                     });
                 }
@@ -297,27 +253,27 @@
             var unitOptions = units.map(unit => `<option value="${unit}">${unit}</option>`).join('');
 
             row.innerHTML = `
-                <td>
-                    <input name="Ingredients[${rowCount}].Name" class="form-control" placeholder="Ingredient name" id="ingredient-${rowCount}" />
-                    <span asp-validation-for="Ingredients[${rowCount}].Name" class="text-danger"></span>
+                                <td>
+                                    <input name="Ingredients[${rowCount}].Name" class="form-control" placeholder="Ingredient name" id="ingredient-${rowCount}" />
+                                    <span asp-validation-for="Ingredients[${rowCount}].Name" class="text-danger"></span>
 
-                    <!-- Input hidden để lưu ProductID -->
-                    <input name="Ingredients[${rowCount}].ProductID" type="hidden" id="productID-${rowCount}" />
+                                    <!-- Input hidden để lưu ProductID -->
+                                    <input name="Ingredients[${rowCount}].ProductID" type="hidden" id="productID-${rowCount}" />
 
-                    <ul id="ingredient-results-${rowCount}" class="search-results-list"></ul>
-                </td>
-                <td><input name="Ingredients[${rowCount}].Quantity" class="form-control" placeholder="Quantity" /></td>
-                <td>
-                    <select name="Ingredients[${rowCount}].Unit" class="form-control">
-                        <option value="">Select Unit</option>
-                        ${unitOptions}
-                    </select>
-                </td>
-                <td><button type="button" class="btn btn-danger" onclick="removeIngredient(this)">Delete</button></td>`;
+                                    <ul id="ingredient-results-${rowCount}" class="search-results-list"></ul>
+                                </td>
+                                <td><input name="Ingredients[${rowCount}].Quantity" class="form-control" placeholder="Quantity" /></td>
+                                <td>
+                                    <select name="Ingredients[${rowCount}].Unit" class="form-control">
+                                        <option value="">Select Unit</option>
+                                        ${unitOptions}
+                                    </select>
+                                </td>
+                                <td><button type="button" class="btn btn-danger" onclick="removeIngredient(this)">Delete</button></td>`;
 
             // Gán sự kiện tìm kiếm cho ô mới
             const newIngredientInput = document.getElementById(`ingredient-${rowCount}`);
-            newIngredientInput.addEventListener('keyup', function() {
+            newIngredientInput.addEventListener('keyup', function () {
                 searchIngredient(rowCount);
             });
         }
@@ -388,7 +344,25 @@
             }
         });
 
+        function addStep() {
+            var table = document.getElementById('stepsTable').getElementsByTagName('tbody')[0];
+            var rowCount = table.rows.length;
+            var row = table.insertRow(rowCount);
+
+            row.innerHTML = `
+                <td><input name="RecipeSteps[${rowCount}].Step" class="form-control" /></td>
+                <td><textarea name="RecipeSteps[${rowCount}].Directions" class="form-control"></textarea></td>
+                <td><input name="RecipeSteps[${rowCount}].FileStep" type="file" class="form-control" /></td>
+                <td><button type="button" class="btn btn-danger" onclick="removeStep(this)">Delete</button></td>`;
+
+            $(`textarea[name='RecipeSteps[${rowCount}].Directions']`).summernote();
+        }
         function removeIngredient(button) {
+            var row = button.closest('tr');
+            row.parentNode.removeChild(row);
+        }
+
+        function removeStep(button) {
             var row = button.closest('tr');
             row.parentNode.removeChild(row);
         }

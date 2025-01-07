@@ -148,7 +148,7 @@
         <div class="col-md-3">
             <p class="text-center my-3">Recipes we're leaving</p>
 
-            @foreach (var recipe in Model)
+            @foreach (var recipe in Model.OrderByDescending(x => x.RatingAverage).Take(2))
             {
                 <a href="recipes/detail/@recipe.RecipeID">
                     <div class="col">

@@ -41,7 +41,7 @@
                 <nav class="nav__menu col-auto d-none d-lg-block ">
                     <ul class="d-flex m-0 p-0">
                         <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Home" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
-                            <a class="nav__link" href="/">Home</a>
+                            <a class="nav__link" href="/Home">Home</a>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Products" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
                             <a class="nav__link" href="/products">Shop</a>
