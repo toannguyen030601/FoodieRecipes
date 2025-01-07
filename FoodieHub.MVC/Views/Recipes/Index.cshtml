@@ -161,7 +161,7 @@
                 {
                     @foreach (var recipe in Model.Items)
                     {
-                        <div class="mt-3 col-6 col-sm-6 col-lg-3 col-md-4">
+                        <div class="mt-3 col-6 col-sm-6 col-lg-3 col-md-4" style="padding:5px;">
                             <div class="card-more-delicious-item">
                                 <a href="@Url.Action("Detail", "Recipes", new { id = recipe.RecipeID })">
                                     <div class="card-more-delicious-item-content">
@@ -283,8 +283,8 @@
         }
 
     </div>
-</div>
- -->
+</div>   -->
+
 <div class="ngancach"></div>
 
 <div class="recipe-section text-center p-3">
@@ -351,13 +351,8 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: normal; /* Đảm bảo không bị hiển thị trên một dòng */
-        font-size: 1rem; /* Kích thước chữ có thể tùy chỉnh */
+        font-size: 0.8rem; /* Kích thước chữ có thể tùy chỉnh */
         color: #333;
-    }
-
-    .card-more-delicious-item-content p {
-        font-size: 14px;
-        color: #555;
     }
 
     .badges {
@@ -376,7 +371,7 @@
         white-space: normal; /* Cho phép xuống dòng */
         word-wrap: break-word; /* Chia chữ khi quá dài */
         text-align: center; /* Canh giữa chữ */
-        font-size: 10px; /* Đặt kích thước chữ phù hợp */
+        font-size: 0.6rem; /* Đặt kích thước chữ phù hợp */
         border-radius: 5px; /* Bo góc cho badge */
     }
 
@@ -396,7 +391,7 @@
         right: 10px;
         background-color: #fff;
         color: #333;
-        font-size: 15px;
+        font-size: 0.8rem;
         border-radius: 15px;
         padding: 5px 8px;
         display: flex;
@@ -413,6 +408,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 5px;
+        font-size: 0.8rem;
     }
 
         .card-more-delicious-item-footer .author {
@@ -422,8 +418,8 @@
 
             .card-more-delicious-item-footer .author img {
                 border-radius: 50%;
-                width: 30px;
-                height: 30px;
+                width: 25px;
+                height: 25px;
                 margin-right: 10px;
             }
 
