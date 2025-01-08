@@ -168,7 +168,7 @@
                                         <img class="img-fluid" alt="@recipe.Title" src="@(url + "images/" + recipe.ImageURL)" />
                                         <div class="badges">
                                             <span class="badge time">
-                                                <i class="far fa-clock"></i> @recipe.CookTime min
+                                                <i class="far fa-clock"></i> @recipe.CookTime.ToString("HH:mm") min
                                             </span>
                                             <span class="badge catename">
                                                 @recipe.CategoryName

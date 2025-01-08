@@ -96,7 +96,7 @@
                             Preparation
                         </p>
                         <p class="value">
-                            @Model.CookTime.ToString(@"HH\:mm") min
+                            @Model.CookTime.ToString("HH:mm") min
                         </p>
                     </div>
                     <div>
@@ -180,7 +180,7 @@
                     {
                         <a class="more-delicious-item" href="@Url.Action("Detail", "Recipes", new { id = recipe.RecipeID })">
                             <div class="time-label">
-                                <i class="far fa-clock"></i> @recipe.CookTime min
+                                <i class="far fa-clock"></i> @recipe.CookTime.ToString("HH:mm") min
                             </div>
                             <img alt="@recipe.Title" src="@(url + "images/" + recipe.ImageURL)" />
                             <div class="item-title">@recipe.Title</div>
@@ -216,7 +216,7 @@
                                                     <img class="img-fluid" alt="@recipe.Title" src="@(url + "images/" + recipe.ImageURL)" />
                                                     <div class="badges">
                                                         <span class="badge time">
-                                                            <i class="far fa-clock"></i> @recipe.CookTime min
+                                                            <i class="far fa-clock"></i> @recipe.CookTime.ToString("HH:mm") min
                                                         </span>
                                                         <span class="badge catename">
                                                             @recipe.CategoryName
