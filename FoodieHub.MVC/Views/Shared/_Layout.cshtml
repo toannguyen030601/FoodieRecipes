@@ -26,6 +26,10 @@
     @RenderSection("recipeindex", required: false)
     @RenderSection("recipedetail", required: false)
 
+    <!-- Notification -->
+    <link href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.1/iconfont/material-icons.min.css" rel="stylesheet" />
+
     <!-- Font awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
@@ -248,5 +252,8 @@
         document.getElementById("avatar").innerHTML = `<i class="fa-solid fa-user"></i>`;
     }
 </script>
+
+
+    @await Component.InvokeAsync("Notyf") <!-- Component để hiển thị thông báo -->
 </body>
 </html>

@@ -6,6 +6,7 @@ using FoodieHub.MVC.Models.Recipe;
 using FoodieHub.MVC.Helpers;
 using FoodieHub.MVC.Models.Comment;
 using FoodieHub.MVC.Models.QueryModel;
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 namespace FoodieHub.MVC.Controllers
 {
@@ -14,11 +15,13 @@ namespace FoodieHub.MVC.Controllers
         private readonly IRecipeService _recipeService;
         private readonly IFavoriteService _favoriteService;
         private readonly ICommentService _commentService;
-        public RecipesController(IRecipeService recipeService, IFavoriteService favoriteService, ICommentService commentService)
+        private readonly INotyfService _notyf;
+        public RecipesController(IRecipeService recipeService, IFavoriteService favoriteService, ICommentService commentService, INotyfService notyf)
         {
             _recipeService = recipeService;
             _favoriteService = favoriteService;
             _commentService = commentService;
+            _notyf = notyf;
         }
         [ValidateTokenForUser]
         [HttpGet]
@@ -35,16 +38,22 @@ namespace FoodieHub.MVC.Controllers
             {
                 if (!recipe.Ingredients.Any() || !recipe.RecipeSteps.Any())
                 {
-                    NotificationHelper.SetErrorNotification(this,"List ingredient and step is required");
+                    /*NotificationHelper.SetErrorNotification(this,"List ingredient and step is required");*/
+                    _notyf.Error("List ingredient and step is required");
                     return View();
                 }
                 bool result = await _recipeService.Create(recipe);
                 if (result)
                 {
-                    NotificationHelper.SetSuccessNotification(this);
+                    /*NotificationHelper.SetSuccessNotification(this);*/
+                    _notyf.Success("Create success");
                     return Redirect("/account/recipes");
                 }
-                else NotificationHelper.SetErrorNotification(this);               
+                else
+                {
+                    /*NotificationHelper.SetErrorNotification(this);*/
+                    _notyf.Error("Create fail");
+                }
             }         
             return View(recipe);
         }
@@ -70,7 +79,8 @@ namespace FoodieHub.MVC.Controllers
                 };
                 return View(edit);
             }
-            NotificationHelper.SetErrorNotification(this);
+            /*NotificationHelper.SetErrorNotification(this);*/
+            _notyf.Error("Not found this recipe");
             return RedirectToAction("Recipes", "Account");
         }
         [ValidateTokenForUser]
@@ -79,7 +89,8 @@ namespace FoodieHub.MVC.Controllers
         {
             if (update.Ingredients.Count() == 0 || update.RecipeSteps.Count() == 0)
             {
-                NotificationHelper.SetErrorNotification(this,"List step and ingredient is required");
+                /*NotificationHelper.SetErrorNotification(this,"List step and ingredient is required");*/
+                _notyf.Error("List step and ingredient is required");
                 return View(update);
             }
             if (ModelState.IsValid)
@@ -87,10 +98,12 @@ namespace FoodieHub.MVC.Controllers
                 var result = await _recipeService.Update(update);
                 if (result)
                 {
-                    NotificationHelper.SetSuccessNotification(this);
+                    /*NotificationHelper.SetSuccessNotification(this);*/
+                    _notyf.Success("Update success");
                     return RedirectToAction("Recipes","Account");
                 }
-                NotificationHelper.SetErrorNotification(this);
+                /*NotificationHelper.SetErrorNotification(this);*/
+                _notyf.Error("Update fail");
             }
             return View(update);
         }
@@ -151,8 +164,16 @@ namespace FoodieHub.MVC.Controllers
         {
             var newFavorite = new FavoriteDTO { RecipeID = id };
             bool result = await _favoriteService.Create(newFavorite);
-            if (result) NotificationHelper.SetSuccessNotification(this);
-            else NotificationHelper.SetErrorNotification(this);
+            if (result)
+            {
+                /*NotificationHelper.SetSuccessNotification(this);*/
+                _notyf.Success("Favorite success");
+            }
+            else
+            {
+                 /*NotificationHelper.SetErrorNotification(this);*/
+                _notyf.Error("Favorite fail");
+            }
             return Redirect("/Recipes/Detail/" + id);
         }
 
@@ -164,9 +185,15 @@ namespace FoodieHub.MVC.Controllers
                 RecipeID = id
             });
             if (result)
-                NotificationHelper.SetSuccessNotification(this);
+            {
+                /*NotificationHelper.SetSuccessNotification(this);*/
+                _notyf.Success("UnFavorite success");
+            }
             else
-                NotificationHelper.SetErrorNotification(this);
+            {
+                /*NotificationHelper.SetErrorNotification(this);*/
+                _notyf.Error("UnFavorite fail");
+            }
             return RedirectToAction("Detail", new { id });
         } 
         [ValidateTokenForUser]
@@ -179,9 +206,16 @@ namespace FoodieHub.MVC.Controllers
             };
             bool result = await _recipeService.Rating(rating);
             if (result)
-                NotificationHelper.SetSuccessNotification(this);
+            {
+                /*NotificationHelper.SetSuccessNotification(this);*/
+                _notyf.Success("Rating success");
+            }
+
             else
-                NotificationHelper.SetErrorNotification(this);
+            {
+                /*NotificationHelper.SetErrorNotification(this);*/
+                _notyf.Error("Rating fail");
+            }
             return Redirect("/Recipes/Detail/" + recipeID);
         }
         [ValidateTokenForUser]
@@ -189,9 +223,15 @@ namespace FoodieHub.MVC.Controllers
         {
             var result = await _recipeService.Delete(id);
             if (result)
-                NotificationHelper.SetSuccessNotification(this);
+            {
+                /*NotificationHelper.SetSuccessNotification(this);*/
+                _notyf.Success("Delete success");
+            }
             else
-                NotificationHelper.SetErrorNotification(this);
+            {
+                /*NotificationHelper.SetErrorNotification(this);*/
+                _notyf.Error("Delete fail");
+            }
             return RedirectToAction("Recipes", "Account");
         }
         [ValidateTokenForUser]

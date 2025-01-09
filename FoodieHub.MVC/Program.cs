@@ -1,4 +1,6 @@
-﻿using FoodieHub.MVC.Configurations;
+﻿using AspNetCoreHero.ToastNotification;
+using AspNetCoreHero.ToastNotification.Extensions;
+using FoodieHub.MVC.Configurations;
 using FoodieHub.MVC.Libraries;
 using FoodieHub.MVC.Service.Implementations;
 using FoodieHub.MVC.Service.Interfaces;
@@ -49,6 +51,15 @@ builder.Services.AddSession(options =>
 builder.Services.AddTransient<CustomHttpClientHandler>();
 
 
+// Thêm ToastNotification
+builder.Services.AddNotyf(config =>
+{
+    config.DurationInSeconds = 5;  // Thời gian hiển thị thông báo
+    config.IsDismissable = true;   // Cho phép đóng thông báo
+    config.Position = NotyfPosition.TopRight;  // Vị trí hiển thị
+    config.HasRippleEffect = true;  // Hiệu ứng khi click vào thông báo
+});
+
 var app = builder.Build();
 
 
@@ -73,4 +84,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Recipes}/{action=Index}/{id?}");
 
+
+app.UseNotyf(); // Kích hoạt middleware của Notyf
 app.Run();
