@@ -16,8 +16,9 @@
     var admins = await userService.GetAdmin();
 }
 @model PaginatedModel<GetRecipeDTO>
-<link rel="stylesheet" href="~/css/Recipes.css" asp-append-version="true">
-
+@section recipeindex {
+    <link rel="stylesheet" href="~/css/Recipes.css" asp-append-version="true">
+}
 
 <div class="container py-5">
     <h2 class="text-center mb-5">Recipe List</h2>
