@@ -1,0 +1,166 @@
+﻿body {
+    background-color: #f8f9fa;
+}
+
+.rating i {
+    color: gold;
+    font-size: 0.8rem;
+    margin-right: 2px;
+}
+
+.card-more-delicious-item {
+    position: relative;
+    background-color: white;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+    overflow: visible; /* Đảm bảo không bị cắt mất */
+    transform-origin: center; /* Phóng lớn từ trung tâm */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+    .card-more-delicious-item:hover {
+        transform: scale(1.05); /* Phóng lớn nhẹ */
+        z-index: 10; /* Đảm bảo nổi lên trên các phần tử khác */
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+.card-more-delicious-item-content {
+    padding: 5px;
+    position: relative;
+}
+
+    .card-more-delicious-item-content img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 15px;
+    }
+
+.card-more-delicious-item h3 {
+    margin: 10px 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Số dòng tối đa */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal; /* Đảm bảo không bị hiển thị trên một dòng */
+    font-size: 0.8rem; /* Kích thước chữ có thể tùy chỉnh */
+    color: #333;
+}
+
+.badges {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.badge {
+    display: inline-block; /* Đảm bảo là inline block */
+    max-width: 100%; /* Đặt giới hạn chiều rộng tối đa */
+    white-space: normal; /* Cho phép xuống dòng */
+    word-wrap: break-word; /* Chia chữ khi quá dài */
+    text-align: center; /* Canh giữa chữ */
+    font-size: 0.6rem; /* Đặt kích thước chữ phù hợp */
+    border-radius: 5px; /* Bo góc cho badge */
+}
+
+    .badge.catename {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .badge.time {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+.favorite {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: #fff;
+    color: #333;
+    font-size: 0.8rem;
+    border-radius: 15px;
+    padding: 5px 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+    .favorite i {
+        color: #ff6b6b;
+    }
+
+.card-more-delicious-item-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    font-size: 0.8rem;
+}
+
+    .card-more-delicious-item-footer .author {
+        display: flex;
+        align-items: center;
+    }
+
+        .card-more-delicious-item-footer .author img {
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            margin-right: 10px;
+        }
+
+    .card-more-delicious-item-footer .rating {
+        display: flex;
+        align-items: center;
+    }
+
+        .card-more-delicious-item-footer .rating i {
+            margin-right: 5px;
+        }
+
+
+
+/* Profile Section */
+.profile-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-image {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.info-box {
+    background-color: #F7F7F7;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.username {
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.view-profile {
+    color: #998675;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+}
