@@ -26,9 +26,8 @@
     @RenderSection("recipeindex", required: false)
     @RenderSection("recipedetail", required: false)
 
-    <!-- Notification -->
+    <!-- Notyf CSS -->
     <link href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.1/iconfont/material-icons.min.css" rel="stylesheet" />
 
     <!-- Font awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
@@ -172,6 +171,9 @@
 <script src="~/js/main.js" asp-append-version="true"></script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Notyf JS -->
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 @await RenderSectionAsync("Scripts", required: false)
 @await Html.PartialAsync("_ValidationScriptsPartial")
 <script>

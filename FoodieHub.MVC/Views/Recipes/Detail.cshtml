@@ -54,15 +54,15 @@
                 <div>
                     @if (listFavorites.Select(x => x.RecipeID).Contains(Model.RecipeID))
                     {
-                        <a asp-action="UnFavorite" asp-route-id="@Model.RecipeID" class="btn btn-outline-secondary">
+                        <button id="favoriteButton" class="btn btn-outline-secondary" onclick="toggleFavorite(@Model.RecipeID, true)">
                             <i class="fas fa-bookmark"></i> UnSave
-                        </a>
+                        </button>
                     }
                     else
                     {
-                        <a asp-action="Favorite" asp-route-id="@Model.RecipeID" class="btn btn-outline-secondary">
+                        <button id="favoriteButton" class="btn btn-outline-secondary" onclick="toggleFavorite(@Model.RecipeID, false)">
                             <i class="far fa-bookmark"></i> Save
-                        </a>
+                        </button>
                     }
                 </div>
             </div>
@@ -464,4 +464,42 @@
             this.textContent = 'Read less';
         }
     });
+
+    function toggleFavorite(recipeID, isFavorite) {
+        const url = isFavorite ? '@Url.Action("UnFavorite", "Recipes")' : '@Url.Action("Favorite", "Recipes")';
+        const button = document.getElementById('favoriteButton');
+
+        fetch(`${url}/${recipeID}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                button.innerHTML = isFavorite ? '<i class="far fa-bookmark"></i> Save' : '<i class="fas fa-bookmark"></i> UnSave';
+                button.setAttribute('onclick', `toggleFavorite(${recipeID}, ${!isFavorite})`);
+            }
+            showNotification(data.message, data.notificationType);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function showNotification(message, type) {
+        const notyf = new Notyf({
+            duration: 5000, // Thời gian hiển thị thông báo
+            dismissible: true, // Cho phép đóng thông báo
+            position: {
+                x: 'right',
+                y: 'top'
+            },
+            ripple: true // Hiệu ứng khi click vào thông báo
+        });
+        if (type === 'success') {
+            notyf.success(message);
+        } else if (type === 'error') {
+            notyf.error(message);
+        }
+    }
 </script>

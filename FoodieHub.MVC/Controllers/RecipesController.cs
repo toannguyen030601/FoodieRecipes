@@ -164,38 +164,19 @@ namespace FoodieHub.MVC.Controllers
         {
             var newFavorite = new FavoriteDTO { RecipeID = id };
             bool result = await _favoriteService.Create(newFavorite);
-            if (result)
-            {
-                /*NotificationHelper.SetSuccessNotification(this);*/
-                _notyf.Success("Favorite success");
-            }
-            else
-            {
-                 /*NotificationHelper.SetErrorNotification(this);*/
-                _notyf.Error("Favorite fail");
-            }
-            return Redirect("/Recipes/Detail/" + id);
+            var message = result ? "Favorite success" : "Favorite fail";
+            var notificationType = result ? "success" : "error";
+            return Json(new { success = result, message, notificationType });
         }
 
         [ValidateTokenForUser]
         public async Task<IActionResult> UnFavorite(int id)
         {
-            bool result = await _favoriteService.Delete(new FavoriteDTO
-            {
-                RecipeID = id
-            });
-            if (result)
-            {
-                /*NotificationHelper.SetSuccessNotification(this);*/
-                _notyf.Success("UnFavorite success");
-            }
-            else
-            {
-                /*NotificationHelper.SetErrorNotification(this);*/
-                _notyf.Error("UnFavorite fail");
-            }
-            return RedirectToAction("Detail", new { id });
-        } 
+            bool result = await _favoriteService.Delete(new FavoriteDTO { RecipeID = id });
+            var message = result ? "UnFavorite success" : "UnFavorite fail";
+            var notificationType = result ? "success" : "error";
+            return Json(new { success = result, message, notificationType });
+        }
         [ValidateTokenForUser]
         public async Task<IActionResult> Rating(int recipeID, int ratingValue)
         {
