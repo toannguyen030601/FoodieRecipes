@@ -175,7 +175,7 @@ namespace FoodieHub.MVC.Controllers
             bool result = await _favoriteService.Delete(new FavoriteDTO { RecipeID = id });
             var message = result ? "UnFavorite success" : "UnFavorite fail";
             var notificationType = result ? "success" : "error";
-            return Json(new { success = result, message, notificationType });
+            return Json(new { success = result, message, notificationType }); 
         }
         [ValidateTokenForUser]
         public async Task<IActionResult> Rating(int recipeID, int ratingValue)
