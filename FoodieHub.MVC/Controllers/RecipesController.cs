@@ -158,7 +158,7 @@ namespace FoodieHub.MVC.Controllers
                 .ToList();
 
             ViewBag.RelatedRecipes = relatedRecipes;
-            ViewBag.UserID = Request.GetCookie("TokenUser");
+            ViewBag.UserID = Request.GetCookie("UserID");
             return View(data);
         }
 
@@ -229,7 +229,7 @@ namespace FoodieHub.MVC.Controllers
             bool result = await _commentService.Create(comment);
             if (result)
             {
-                await _hubContext.Clients.All.SendAsync("ReceiveComment", comment.CommentContent, avatar, fullName);
+                await _hubContext.Clients.All.SendAsync("ReceiveComment", comment.RecipeID.ToString(), comment.CommentContent, avatar, fullName);
                 return Json(new { success = true, message = "Comment submitted successfully" });
             }
             else
@@ -241,9 +241,14 @@ namespace FoodieHub.MVC.Controllers
         public async Task<IActionResult> DeleteComment(int id,int recipeID)
         {
             bool result = await _commentService.Delete(id);
-            if (result) NotificationHelper.SetSuccessNotification(this);
-            else NotificationHelper.SetErrorNotification(this);
-            return RedirectToAction("Detail", new { id = recipeID });
+            if (result)
+            {
+                return Json(new { success = true, message = "Delete success" });
+            }
+            else
+            {
+                return Json(new { success = false, message = "Delete fail" });
+            }
         }
         [ValidateTokenForUser]
         public async Task<IActionResult> EditComment(int CommentID,string CommentContent,int RecipeID)

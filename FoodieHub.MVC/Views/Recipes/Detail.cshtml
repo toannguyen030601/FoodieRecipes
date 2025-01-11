@@ -293,7 +293,7 @@
         <div id="commentsList" style="overflow: auto; max-height: 500px;">
             @foreach (var comment in comments)
             {
-                <div class="d-flex align-items-center mb-4 bg-light p-3 rounded shadow-sm position-relative">
+                <div id="comment-@comment.CommentID" class="d-flex align-items-center mb-4 bg-light p-3 rounded shadow-sm position-relative">
                     @if (comment.Avatar != null)
                     {
                         <img src="@($"{url}images/{comment.Avatar}")" alt="Avatar" class="rounded-circle me-3" style="width:30px;height:30px; object-fit: cover;">
@@ -319,7 +319,7 @@
                                     <button class="dropdown-item" onclick="openEditModal('@comment.CommentID', '@comment.CommentContent',@Model.RecipeID)">Edit</button>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item text-danger" asp-action="DeleteComment" asp-route-recipeID="@Model.RecipeID" asp-route-id="@comment.CommentID">Delete</a>
+                                    <button class="dropdown-item text-danger" onclick="deleteComment('@comment.CommentID',@Model.RecipeID)">Delete</button>
                                 </li>
                             </ul>
                         </div>
@@ -505,40 +505,28 @@
         }
     }
 
-    const baseUrl = '@url';
-
+        const baseUrl = '@url';
+    const recipeID = '@Model.RecipeID';
     const connection = new signalR.HubConnectionBuilder()
         .withUrl("/commentHub")
         .build();
 
-    connection.on("ReceiveComment", function (message, avatar, fullName) {
+    connection.on("ReceiveComment", function (receivedRecipeID, message, avatar, fullName) {
+        if (receivedRecipeID !== recipeID) {
+            console.log("Recipe ID mismatch:", receivedRecipeID, recipeID);
+            return;
+        }
         const commentsList = document.getElementById('commentsList');
-        const commentElement = document.createElement('div');
-        commentElement.classList.add('d-flex', 'align-items-center', 'mb-4', 'bg-light', 'p-3', 'rounded', 'shadow-sm', 'position-relative');
-
-        const avatarElement = document.createElement('img');
-        avatarElement.src = avatar ? `${baseUrl}images/${avatar}` : '/images/profile.jpg';
-        avatarElement.alt = 'Avatar';
-        avatarElement.classList.add('rounded-circle', 'me-3');
-        avatarElement.style.width = '30px';
-        avatarElement.style.height = '30px';
-        avatarElement.style.objectFit = 'cover';
-
-        const commentContentElement = document.createElement('div');
-        const commentHeader = document.createElement('p');
-        commentHeader.classList.add('mb-1');
-        commentHeader.innerHTML = `<strong>${fullName}</strong> - ${new Date().toLocaleString()}`;
-        const commentText = document.createElement('p');
-        commentText.classList.add('mb-0');
-        commentText.textContent = message;
-
-        commentContentElement.appendChild(commentHeader);
-        commentContentElement.appendChild(commentText);
-
-        commentElement.appendChild(avatarElement);
-        commentElement.appendChild(commentContentElement);
-
-        commentsList.prepend(commentElement); // Thêm bình luận mới vào đầu danh sách
+        const commentHTML = `
+            <div class="d-flex align-items-center mb-4 bg-light p-3 rounded shadow-sm position-relative">
+                <img src="${avatar ? `${baseUrl}images/${avatar}` : '/images/profile.jpg'}" alt="Avatar" class="rounded-circle me-3" style="width:30px;height:30px;object-fit:cover;">
+                <div>
+                    <p class="mb-1"><strong>${fullName}</strong> - ${new Date().toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}</p>
+                    <p class="mb-0">${message}</p>
+                </div>
+            </div>
+        `;
+        commentsList.insertAdjacentHTML('afterbegin', commentHTML); // Add the new comment to the top of the list
     });
 
     connection.start().catch(function (err) {
@@ -573,4 +561,33 @@
             showNotification('An error occurred while submitting the comment', 'error');
         });
     });
+
+    function deleteComment(commentID, recipeID) {
+        const url = '@Url.Action("DeleteComment", "Recipes")';
+
+        fetch(`${url}/${commentID}?recipeID=${recipeID}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Handle success (e.g., remove the comment from the list, show a notification)
+                showNotification(data.message, 'success');
+                const commentElement = document.getElementById(`comment-${commentID}`);
+                if (commentElement) {
+                    commentElement.remove();
+                }
+            } else {
+                // Handle error
+                showNotification(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('An error occurred while deleting the comment', 'error');
+        });
+    }
 </script>
