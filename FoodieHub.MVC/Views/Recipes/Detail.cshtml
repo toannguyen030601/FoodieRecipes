@@ -267,8 +267,20 @@
 
     <!-- Reviews Section -->
     <div id="reviews" class="m-3">
+        <div class="text-center">
+            <span class="rating-text" id="ratingText">Hover over the stars to rate</span>
+        </div>
+        <div class="d-flex star-rating justify-content-center">
+            <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 1 })" class="star" data-value="1">★</a>
+            <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 2 })" class="star" data-value="2">★</a>
+            <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 3 })" class="star" data-value="3">★</a>
+            <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 4 })" class="star" data-value="4">★</a>
+            <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 5 })" class="star" data-value="5">★</a>
+        </div>
+
+
         <!-- Create Comment Form -->
-        <form asp-action="CreateComment" method="post" class="mb-4">
+        <form id="createCommentForm" method="post" class="mb-4">
             <div class="d-flex justify-content-between">
                 <h5>REVIEWS (@comments.Count())</h5>
                 <button type="submit" class="button button-dark">Submit Review</button>
@@ -278,7 +290,7 @@
         </form>
 
         <!-- Comments List -->
-        <div id="commentsList">
+        <div id="commentsList" style="overflow: auto; max-height: 500px;">
             @foreach (var comment in comments)
             {
                 <div class="d-flex align-items-center mb-4 bg-light p-3 rounded shadow-sm position-relative">
@@ -315,18 +327,6 @@
                 </div>
             }
         </div>
-
-        <div class="text-center">
-            <span class="rating-text" id="ratingText">Hover over the stars to rate</span>
-        </div>
-        <div class="d-flex star-rating justify-content-center">
-            <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 1 })" class="star" data-value="1">★</a>
-            <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 2 })" class="star" data-value="2">★</a>
-            <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 3 })" class="star" data-value="3">★</a>
-            <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 4 })" class="star" data-value="4">★</a>
-            <a href="@Url.Action("Rating", "Recipes", new { recipeID = Model.RecipeID, ratingValue = 5 })" class="star" data-value="5">★</a>
-        </div>
-
     </div>
 </div>
 
@@ -356,6 +356,8 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
 <script>
     function openEditModal(commentID, commentContent,recipeID) {
         // Set values in the modal
@@ -502,4 +504,73 @@
             notyf.error(message);
         }
     }
+
+    const baseUrl = '@url';
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/commentHub")
+        .build();
+
+    connection.on("ReceiveComment", function (message, avatar, fullName) {
+        const commentsList = document.getElementById('commentsList');
+        const commentElement = document.createElement('div');
+        commentElement.classList.add('d-flex', 'align-items-center', 'mb-4', 'bg-light', 'p-3', 'rounded', 'shadow-sm', 'position-relative');
+
+        const avatarElement = document.createElement('img');
+        avatarElement.src = avatar ? `${baseUrl}images/${avatar}` : '/images/profile.jpg';
+        avatarElement.alt = 'Avatar';
+        avatarElement.classList.add('rounded-circle', 'me-3');
+        avatarElement.style.width = '30px';
+        avatarElement.style.height = '30px';
+        avatarElement.style.objectFit = 'cover';
+
+        const commentContentElement = document.createElement('div');
+        const commentHeader = document.createElement('p');
+        commentHeader.classList.add('mb-1');
+        commentHeader.innerHTML = `<strong>${fullName}</strong> - ${new Date().toLocaleString()}`;
+        const commentText = document.createElement('p');
+        commentText.classList.add('mb-0');
+        commentText.textContent = message;
+
+        commentContentElement.appendChild(commentHeader);
+        commentContentElement.appendChild(commentText);
+
+        commentElement.appendChild(avatarElement);
+        commentElement.appendChild(commentContentElement);
+
+        commentsList.prepend(commentElement); // Thêm bình luận mới vào đầu danh sách
+    });
+
+    connection.start().catch(function (err) {
+        return console.error(err.toString());
+    });
+
+    document.getElementById('createCommentForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        const form = event.target;
+        const formData = new FormData(form);
+        const url = '@Url.Action("CreateComment", "Recipes")';
+
+        fetch(url, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Handle success (e.g., update the comments list, show a notification)
+                showNotification(data.message, 'success');
+                // Optionally, you can reset the form or update the comments list dynamically
+                form.reset();
+            } else {
+                // Handle error
+                showNotification(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('An error occurred while submitting the comment', 'error');
+        });
+    });
 </script>

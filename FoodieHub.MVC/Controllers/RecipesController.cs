@@ -7,6 +7,7 @@ using FoodieHub.MVC.Helpers;
 using FoodieHub.MVC.Models.Comment;
 using FoodieHub.MVC.Models.QueryModel;
 using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.AspNetCore.SignalR;
 
 namespace FoodieHub.MVC.Controllers
 {
@@ -16,12 +17,15 @@ namespace FoodieHub.MVC.Controllers
         private readonly IFavoriteService _favoriteService;
         private readonly ICommentService _commentService;
         private readonly INotyfService _notyf;
-        public RecipesController(IRecipeService recipeService, IFavoriteService favoriteService, ICommentService commentService, INotyfService notyf)
+        private readonly IHubContext<CommentHub> _hubContext;
+
+        public RecipesController(IRecipeService recipeService, IFavoriteService favoriteService, ICommentService commentService, INotyfService notyf, IHubContext<CommentHub> hubContext)
         {
             _recipeService = recipeService;
             _favoriteService = favoriteService;
             _commentService = commentService;
             _notyf = notyf;
+            _hubContext = hubContext;
         }
         [ValidateTokenForUser]
         [HttpGet]
@@ -154,7 +158,7 @@ namespace FoodieHub.MVC.Controllers
                 .ToList();
 
             ViewBag.RelatedRecipes = relatedRecipes;
-            ViewBag.UserID = Request.GetCookie("UserID");
+            ViewBag.UserID = Request.GetCookie("TokenUser");
             return View(data);
         }
 
@@ -218,10 +222,20 @@ namespace FoodieHub.MVC.Controllers
         [ValidateTokenForUser]
         public async Task<IActionResult> CreateComment(CommentDTO comment)
         {
+            // Lấy avatar và fullname từ cookie
+            var avatar = Request.Cookies["Avatar"];
+            var fullName = Request.Cookies["FullName"];
+
             bool result = await _commentService.Create(comment);
-            if(result) NotificationHelper.SetSuccessNotification(this);
-            else NotificationHelper.SetErrorNotification(this);
-            return RedirectToAction("Detail", new { id = comment.RecipeID});
+            if (result)
+            {
+                await _hubContext.Clients.All.SendAsync("ReceiveComment", comment.CommentContent, avatar, fullName);
+                return Json(new { success = true, message = "Comment submitted successfully" });
+            }
+            else
+            {
+                return Json(new { success = false, message = "Failed to submit comment" });
+            }
         }
         [ValidateTokenForUser]
         public async Task<IActionResult> DeleteComment(int id,int recipeID)
@@ -241,6 +255,12 @@ namespace FoodieHub.MVC.Controllers
             if (result) NotificationHelper.SetSuccessNotification(this);
             else NotificationHelper.SetErrorNotification(this);
             return RedirectToAction("Detail", new { id = RecipeID });
+        }
+
+        public async Task<IActionResult> GetCommentRecipe(int id)
+        {
+            var comments = await _commentService.GetCommentRecipe(id);
+            return Json(comments);
         }
     }
 }

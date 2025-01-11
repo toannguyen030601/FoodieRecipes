@@ -1,6 +1,7 @@
 ﻿using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
 using FoodieHub.MVC.Configurations;
+using FoodieHub.MVC.Helpers;
 using FoodieHub.MVC.Libraries;
 using FoodieHub.MVC.Service.Implementations;
 using FoodieHub.MVC.Service.Interfaces;
@@ -50,6 +51,8 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddTransient<CustomHttpClientHandler>();
 
+// Thêm SignalR
+builder.Services.AddSignalR();
 
 // Thêm ToastNotification
 builder.Services.AddNotyf(config =>
@@ -84,6 +87,8 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Recipes}/{action=Index}/{id?}");
 
+// Thêm endpoint cho SignalR
+app.MapHub<CommentHub>("/commentHub");
 
 app.UseNotyf(); // Kích hoạt middleware của Notyf
 app.Run();
