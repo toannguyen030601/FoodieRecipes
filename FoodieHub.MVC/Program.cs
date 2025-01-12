@@ -51,8 +51,6 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddTransient<CustomHttpClientHandler>();
 
-// Thêm SignalR
-builder.Services.AddSignalR();
 
 // Thêm ToastNotification
 builder.Services.AddNotyf(config =>
@@ -86,9 +84,6 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Recipes}/{action=Index}/{id?}");
-
-// Thêm endpoint cho SignalR
-app.MapHub<CommentHub>("/commentHub");
 
 app.UseNotyf(); // Kích hoạt middleware của Notyf
 app.Run();

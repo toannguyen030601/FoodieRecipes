@@ -7,7 +7,6 @@ using FoodieHub.MVC.Helpers;
 using FoodieHub.MVC.Models.Comment;
 using FoodieHub.MVC.Models.QueryModel;
 using AspNetCoreHero.ToastNotification.Abstractions;
-using Microsoft.AspNetCore.SignalR;
 
 namespace FoodieHub.MVC.Controllers
 {
@@ -17,15 +16,13 @@ namespace FoodieHub.MVC.Controllers
         private readonly IFavoriteService _favoriteService;
         private readonly ICommentService _commentService;
         private readonly INotyfService _notyf;
-        private readonly IHubContext<CommentHub> _hubContext;
 
-        public RecipesController(IRecipeService recipeService, IFavoriteService favoriteService, ICommentService commentService, INotyfService notyf, IHubContext<CommentHub> hubContext)
+        public RecipesController(IRecipeService recipeService, IFavoriteService favoriteService, ICommentService commentService, INotyfService notyf)
         {
             _recipeService = recipeService;
             _favoriteService = favoriteService;
             _commentService = commentService;
             _notyf = notyf;
-            _hubContext = hubContext;
         }
         [ValidateTokenForUser]
         [HttpGet]
@@ -229,7 +226,6 @@ namespace FoodieHub.MVC.Controllers
             bool result = await _commentService.Create(comment);
             if (result)
             {
-                await _hubContext.Clients.All.SendAsync("ReceiveComment", comment.RecipeID.ToString(), comment.CommentContent, avatar, fullName);
                 return Json(new { success = true, message = "Comment submitted successfully" });
             }
             else
