@@ -219,10 +219,15 @@ namespace FoodieHub.MVC.Controllers
         [ValidateTokenForUser]
         public async Task<IActionResult> CreateComment(CommentDTO comment)
         {
+            var avatarUrl = Request.Cookies["Avatar"];
+            var userId = Request.Cookies["UserID"];
+            var fullName = Request.Cookies["FullName"];
+            var commentedAt = DateTime.Now;
+
             bool result = await _commentService.Create(comment);
             if (result)
             {
-                return Json(new { success = true, message = "Comment submitted successfully" });
+                return Json(new { success = true, message = "Comment submitted", fullName });
             }
             else
             {
