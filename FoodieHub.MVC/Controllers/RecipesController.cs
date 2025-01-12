@@ -219,10 +219,6 @@ namespace FoodieHub.MVC.Controllers
         [ValidateTokenForUser]
         public async Task<IActionResult> CreateComment(CommentDTO comment)
         {
-            // Lấy avatar và fullname từ cookie
-            var avatar = Request.Cookies["Avatar"];
-            var fullName = Request.Cookies["FullName"];
-
             bool result = await _commentService.Create(comment);
             if (result)
             {

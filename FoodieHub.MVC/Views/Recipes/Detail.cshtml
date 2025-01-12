@@ -357,7 +357,6 @@
     </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
 <script>
     function openEditModal(commentID, commentContent,recipeID) {
         // Set values in the modal
@@ -518,11 +517,12 @@
         })
         .then(response => response.json())
         .then(data => {
+            console.log(data)
+
             if (data.success) {
-                // Handle success (e.g., update the comments list, show a notification)
                 showNotification(data.message, 'success');
-                // Optionally, you can reset the form or update the comments list dynamically
-                form.reset();
+                showcomment();
+                form.reset(); // Reset the form
             } else {
                 // Handle error
                 showNotification(data.message, 'error');
@@ -530,9 +530,53 @@
         })
         .catch(error => {
             console.error('Error:', error);
-            showNotification('An error occurred while submitting the comment', 'error');
+            showNotification('An error occurred while creating the comment', 'error');
         });
     });
+
+    function showComments() {
+        const recipeID = '@Model.RecipeID';
+        const url = '@Url.Action("GetCommentRecipe", "Recipes")';
+
+        fetch(`${url}/${recipeID}`)
+        .then(response => response.json())
+        .then(data => {
+            const commentsList = document.getElementById('commentsList');
+            commentsList.innerHTML = ''; // Clear the existing comments
+
+            data.forEach(comment => {
+                const commentElement = document.createElement('div');
+                commentElement.id = `comment-${comment.CommentID}`;
+                commentElement.className = 'd-flex align-items-center mb-4 bg-light p-3 rounded shadow-sm position-relative';
+                commentElement.innerHTML = `
+                    <img src="${comment.Avatar ? `${url}images/${comment.Avatar}` : '/images/profile.jpg'}" alt="Avatar" class="rounded-circle me-3" style="width:30px;height:30px; object-fit: cover;">
+                    <div>
+                        <p class="mb-1"><strong>${comment.FullName}</strong> - ${new Date(comment.CommentedAt).toLocaleString()}</p>
+                        <p class="mb-0">${comment.CommentContent}</p>
+                    </div>
+                    ${comment.UserID == '${userID}' ? `
+                    <div class="dropdown ms-auto position-absolute top-0 end-0 me-3">
+                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <li>
+                                <button class="dropdown-item" onclick="openEditModal('${comment.CommentID}', '${comment.CommentContent}', ${comment.RecipeID})">Edit</button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item text-danger" onclick="deleteComment('${comment.CommentID}', ${comment.RecipeID})">Delete</button>
+                            </li>
+                        </ul>
+                    </div>` : ''}
+                `;
+                commentsList.appendChild(commentElement);
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('An error occurred while fetching the comments', 'error');
+        });
+    }
 
     function deleteComment(commentID, recipeID) {
         const url = '@Url.Action("DeleteComment", "Recipes")';
