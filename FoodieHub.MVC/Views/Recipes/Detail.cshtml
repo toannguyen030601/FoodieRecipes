@@ -6,7 +6,7 @@
 @model DetailRecipeDTO
 @{
     var url = config["BaseHost"];
-    ViewData["Title"] = "Detail";
+    ViewData["Title"] = Model.Title;
     Layout = "~/Views/Shared/_Layout.cshtml";
     var comments = await commentService.GetCommentRecipe(Model.RecipeID);
 
@@ -519,9 +519,9 @@
         .then(data => {
 
             if (data.success) {
-                showNotification(data.message, 'success');
                 form.reset();
                 location.reload();
+                showNotification(data.message, 'success');
             } else {
                 showNotification(data.message, 'error');
             }

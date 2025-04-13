@@ -7,7 +7,7 @@
 @inject IConfiguration config
 @inject IFavoriteService favoriteService;
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Recipes";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var url = config["BaseHost"];
     var query = ViewBag.Query as QueryRecipeModel ?? new QueryRecipeModel();

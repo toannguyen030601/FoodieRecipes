@@ -4,7 +4,7 @@
 @inject IRecipeCategoryService categoryService
 @inject IProductService productService
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Recipe";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var categories = await categoryService.GetAll() ?? new List<GetRecipeCategoryDTO>();
     var units = new List<string>{
