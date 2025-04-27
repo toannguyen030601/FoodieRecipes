@@ -80,7 +80,9 @@
             <span id="total-price" class="font-weight-bold">@($"${Model?.Sum(i => (i.Price - (i.Price * i.Discount / 100)) * i.Quantity).ToString("0.00")}")</span>
         </div>
         <hr>
-        <a asp-controller="Cart" asp-action="Checkout" class="button button-dark w-100">CHECK OUT</a>
+        <div class="d-flex justify-content-center w-100" style="height: 50px;">
+            <a asp-controller="Cart" asp-action="Checkout" class="btn btn-dark w-100 align-content-center">CHECK OUT</a>
+        </div>
     </div>
 </div>
 
