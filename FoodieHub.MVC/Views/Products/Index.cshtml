@@ -118,76 +118,79 @@
                     var oneMonthAgo = DateTime.Now.AddMonths(-1); // Lấy ngày cách đây 1 tháng
                     bool isNewProduct = item.CreatedAt >= oneMonthAgo;
 
-                    <div class="col-md-3">
+                    <div class="col-md-3 col-lg-3 col-6">
                         <div class="product-card p-3 shadow-sm position-relative">
-
-                            <a asp-action="Detail" asp-controller="Products" asp-route-id="@item.ProductID" class="">
-                                <img src="@($"{apiUrl}Images/{item.MainImage}")" alt="Product Image" class="product-image">
+                            <a asp-action="Detail" asp-controller="Products" asp-route-id="@item.ProductID" class=" text-center">
+                                <img src="@($"{apiUrl}Images/{item.MainImage}")"
+                                     alt="Product Image"
+                                     class="product-image img-fluid mx-auto"
+                                     onerror="this.onerror=null; this.src='/images/user-logo-test.png';" />
                             </a>
-
-                            <!-- Hiển thị chữ New nếu sản phẩm mới -->
-                            @if (isNewProduct)
-                            {
-                                <span class="badge new-badge position-absolute top-0  m-2">New</span>
-                            }
-
-                            <a asp-action="Detail" asp-controller="Products" asp-route-id="@item.ProductID" class="">
-                                <h6 class="mt-3">@item.ProductName</h6>
-                            </a>
-
-                            <p class="mb-1">
-                                @{
-                                    var discountedPriceMain = (item.Price - (item.Price * item.Discount / 100)).ToString("0.00");
-                                }
-                                @if (item.Discount == 0)
+                            <div>
+                                <!-- Hiển thị chữ New nếu sản phẩm mới -->
+                                @if (isNewProduct)
                                 {
-                                    <span class="text-danger">$@item.Price.ToString("0.00")</span>
-                                }
-                                else
-                                {
-                                    <span class="text-decoration-line-through text-muted">$@item.Price.ToString("0.00")</span>
-                                    <span class="h5 text-danger mx-2">$@discountedPriceMain</span>
-                                    <span class="discount-percent-text">-@item.Discount.ToString("0") %</span>
-                                }
-                            </p>
-
-                            @{
-                                var listReviewOrther = await _reviewService.GetListReview(item.ProductID);
-                                int averageRatingOther = 0;
-                                if (listReviewOrther.Data != null && listReviewOrther.Data.Any())
-                                {
-                                    double totalRate = listReviewOrther.Data.Sum(x => x.RatingValue); // Tổng tất cả rate
-                                    double avgRate = totalRate / listReviewOrther.Data.Count;  // Trung bình rate
-
-                                    averageRatingOther = avgRate >= 3.5 ? (int)Math.Ceiling(avgRate) : (int)Math.Floor(avgRate);
-                                }
-                            }
-                            <p class="text-warning">@averageRatingOther ★</p>
-
-                            <div class="d-flex justify-content-between mt-3">
-                                @if (item.StockQuantity <= 0)
-                                {
-                                    <button class="btn text-danger btn-sm" disabled>Out of stock</button>
-                                }
-                                else
-                                {
-                                    <a href="@Url.Action("AddToCart", "Cart", new { productId = item.ProductID, quantity = 1 })" class="btn button-light btn-sm">Add to cart</a>
+                                    <span class="badge new-badge position-absolute top-0  m-2">New</span>
                                 }
 
-                                @{
-                                    int totalSoldCount = 0;
-                                    if (listOrderDetail?.Data != null)
+                                <a asp-action="Detail" asp-controller="Products" asp-route-id="@item.ProductID" class="">
+                                    <h6 class="mt-3">@item.ProductName</h6>
+                                </a>
+
+                                <p class="mb-1">
+                                    @{
+                                        var discountedPriceMain = (item.Price - (item.Price * item.Discount / 100)).ToString("0.00");
+                                    }
+                                    @if (item.Discount == 0)
                                     {
-                                        foreach (var itemDT in listOrderDetail.Data)
+                                        <span class="text-danger">$@item.Price.ToString("0.00")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-decoration-line-through text-muted">$@item.Price.ToString("0.00")</span>
+                                        <span class="h5 text-danger mx-2">$@discountedPriceMain</span>
+                                        <span class="discount-percent-text">-@item.Discount.ToString("0") %</span>
+                                    }
+                                </p>
+
+                                @{
+                                    var listReviewOrther = await _reviewService.GetListReview(item.ProductID);
+                                    int averageRatingOther = 0;
+                                    if (listReviewOrther.Data != null && listReviewOrther.Data.Any())
+                                    {
+                                        double totalRate = listReviewOrther.Data.Sum(x => x.RatingValue); // Tổng tất cả rate
+                                        double avgRate = totalRate / listReviewOrther.Data.Count;  // Trung bình rate
+
+                                        averageRatingOther = avgRate >= 3.5 ? (int)Math.Ceiling(avgRate) : (int)Math.Floor(avgRate);
+                                    }
+                                }
+                                <p class="text-warning">@averageRatingOther ★</p>
+
+                                <div class="d-flex justify-content-between mt-3">
+                                    @if (item.StockQuantity <= 0)
+                                    {
+                                        <button class="btn text-danger btn-sm" disabled>Out of stock</button>
+                                    }
+                                    else
+                                    {
+                                        <a href="@Url.Action("AddToCart", "Cart", new { productId = item.ProductID, quantity = 1 })" class="btn button-light btn-sm">Add to cart</a>
+                                    }
+
+                                    @{
+                                        int totalSoldCount = 0;
+                                        if (listOrderDetail?.Data != null)
                                         {
-                                            if (itemDT.ProductID == item.ProductID && itemDT.Status == "COMPLETED")
+                                            foreach (var itemDT in listOrderDetail.Data)
                                             {
-                                                totalSoldCount += itemDT.Quantity; // Cộng số lượng sản phẩm đã bán
+                                                if (itemDT.ProductID == item.ProductID && itemDT.Status == "COMPLETED")
+                                                {
+                                                    totalSoldCount += itemDT.Quantity; // Cộng số lượng sản phẩm đã bán
+                                                }
                                             }
                                         }
                                     }
-                                }
-                                <span class="sold-text mt-2">Sold: @totalSoldCount Pcs</span>
+                                    <span class="sold-text mt-2">Sold: @totalSoldCount Pcs</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -276,7 +279,7 @@ a h6:hover {
 
     .product-card {
         background-color: #fff;
-        border-radius: 10px;
+        border-radius: 15px;
         border: 1px solid #eaeaea;
         transition: all 0.3s ease;
         text-align: center;
@@ -287,12 +290,14 @@ a h6:hover {
         }
 
     .product-image {
-        width: 100%;
+        width: 200px;
         height: 200px;
-        border-radius: 8px;
     }
 
-
+    product-image img{
+        width: 100%;
+        height: 100%;
+    }
 
     .pagination a {
         color: #444;

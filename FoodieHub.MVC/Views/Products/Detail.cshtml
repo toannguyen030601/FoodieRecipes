@@ -188,7 +188,7 @@
                         {
                             <a id="addToCartButton"
                                href="@Url.Action("AddToCart", "Cart", new { productId = Model.Data.ProductID, quantity = 1 })"
-                               class="btn btn-primary w-100"
+                               class="btn btn-primary"
                                style="background-color: #2d4356; margin-top: 2em;">
                                 ADD TO CART
                             </a>
@@ -232,13 +232,6 @@
                     </div>
                 </div>
             </div>
-
-
-
-
-           
-
-
             <!-- Details Section -->
             <div class="details-section">
                 <h5 class="mb-3">DETAILS</h5>
@@ -349,7 +342,7 @@
             if (listOrder?.Data != null && listOrderDetails?.Data != null)
             {
                 // Lặp qua danh sách đơn hàng hoàn thành của người dùng
-                foreach (var order in listOrder.Data.Where(o => o.Status == "COMPLETED" && o.UserID == currentUserId.Result.Id))
+                foreach (var order in listOrder.Data.Where(o => o.Status == "COMPLETED"))
                 {
                     // Kiểm tra nếu đơn hàng này trong thời hạn review
                     if ((DateTime.Now - order.OrderedAt).TotalDays <= 30)
@@ -456,7 +449,7 @@
 
                             <div class="review-body">@item.ReviewContent </div>
 
-                            @if (item?.Id == currentUserId?.Result?.Id)
+                            @if (currentUserId?.Result != null && item?.Id == currentUserId.Result.Id)
                             {
                                 <div class="text-end mt-2">
                                     @if ((DateTime.Now - reviewDate).TotalDays <= 30)
@@ -514,7 +507,7 @@
                                     @item.ReviewContent
                                 </div>
 
-                                @if (item.Id == currentUserId?.Result?.Id)
+                                @if (currentUserId?.Result != null && item?.Id == currentUserId.Result.Id)
                                 {
                                     <div class="text-end mt-2">
                                         <a class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateReviewModal(@item.ReviewID)">Edit</a>
@@ -569,7 +562,7 @@
                                     @item.ReviewContent
                                 </div>
 
-                                @if (item.Id == currentUserId?.Result?.Id)
+                                @if (currentUserId?.Result != null && item?.Id == currentUserId.Result.Id)
                                 {
                                     <div class="text-end mt-2">
                                         <a class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateReviewModal(@item.ReviewID)">Edit</a>
@@ -598,7 +591,7 @@
                 {
                     @foreach (var item in listReview.Data)
                     {
-                        if (item?.RatingValue == 3) // Kiểm tra nếu điểm đánh giá là 5
+                        if (item?.RatingValue == 3)
                         {
                             var ratingValue = item.RatingValue;
                             var reviewDate = item?.ReviewedAt ?? DateTime.MinValue; // Giá trị mặc định là ngày tối thiểu
@@ -624,7 +617,7 @@
                                     @item.ReviewContent
                                 </div>
 
-                                @if (item.Id == currentUserId?.Result?.Id)
+                                @if (currentUserId?.Result != null && item?.Id == currentUserId.Result.Id)
                                 {
                                     <div class="text-end mt-2">
                                         <a class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateReviewModal(@item.ReviewID)">Edit</a>
@@ -678,7 +671,7 @@
                                     @item.ReviewContent
                                 </div>
 
-                                @if (item.Id == currentUserId?.Result?.Id)
+                                @if (currentUserId?.Result != null && item?.Id == currentUserId.Result.Id)
                                 {
                                     <div class="text-end mt-2">
                                         <a class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateReviewModal(@item.ReviewID)">Edit</a>
@@ -732,7 +725,7 @@
                                     @item.ReviewContent 
                                 </div>
 
-                                @if (item.Id == currentUserId?.Result?.Id)
+                                @if (currentUserId?.Result != null && item?.Id == currentUserId.Result.Id)
                                 {
                                     <div class="text-end mt-2">
                                         <a class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateReviewModal(@item.ReviewID)">Edit</a>
@@ -753,9 +746,6 @@
                 </button>
             </div>
         </div>
-
-
-
 
     </div>
 
@@ -901,8 +891,7 @@
         }
 
     .main-image img {
-        width: 100%;
-        height: 50vh;
+        width: 400px;
         object-fit: cover;
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
