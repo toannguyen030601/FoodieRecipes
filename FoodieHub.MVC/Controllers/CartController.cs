@@ -6,6 +6,7 @@ using FoodieHub.MVC.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using FoodieHub.MVC.Helpers;
 using FoodieHub.MVC.Models.Recipe;
+using AspNetCoreHero.ToastNotification.Abstractions;
 namespace FoodieHub.MVC.Controllers
 {
     public class CartController : Controller
@@ -13,11 +14,13 @@ namespace FoodieHub.MVC.Controllers
         private readonly IProductService _productService;
         private readonly IVnPayService _vnPayService;
         private readonly HttpClient _httpClient;
-        public CartController(IVnPayService vnPayService, IProductService productService, IHttpClientFactory httpClientFactory)
+        private readonly INotyfService _notyf;
+        public CartController(IVnPayService vnPayService, IProductService productService, IHttpClientFactory httpClientFactory, INotyfService notyf)
         {
             _vnPayService = vnPayService;
             _productService = productService;
             _httpClient = httpClientFactory.CreateClient("MyAPI");
+            _notyf = notyf;
         }
         [ValidateTokenForUser]
         public async Task<IActionResult> Checkout()
@@ -217,7 +220,7 @@ namespace FoodieHub.MVC.Controllers
 
             if (!hasProduct)
             {
-                TempData["ErrorMessage"] = "No products were found in the ingredients!";
+                _notyf.Error("No products were found in the ingredients!");
                 return RedirectToAction("Detail", "Recipes", new { id = recipeDetails.RecipeID });
             }
 
@@ -226,7 +229,7 @@ namespace FoodieHub.MVC.Controllers
 
             Response.Cookies.Append("cart", newCartItemsJson);
 
-            TempData["SuccessMessage"] = "All products from the recipe have been added to the cart successfully!";
+            _notyf.Success("All products from the recipe have been added to the cart successfully!");
             var refererUrl = Request.Headers["Referer"].ToString();
             return Redirect(refererUrl ?? Url.Action("Checkout", "Cart"));
         }
