@@ -114,7 +114,7 @@ namespace FoodieHub.API.Repositories.Implementations
         } 
         public async Task<PaginatedModel<GetRecipeDTO>> Get(QueryRecipeModel query)
         {
-            var listRecipes = _context.Recipes.AsQueryable();
+            var listRecipes = _context.Recipes.OrderByDescending(x => x.CreatedAt).AsQueryable();
             if (!string.IsNullOrEmpty(query.SearchIngredient))
             {
                 listRecipes = listRecipes.Where(recipe =>

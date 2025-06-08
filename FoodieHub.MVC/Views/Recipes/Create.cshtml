@@ -40,8 +40,8 @@
                     </div>
                     <div class="row">
                         <div class="form-group col-12 col-md-4">
-                            <label asp-for="CookTime" class="font-weight-bold">Cook Time</label>
-                            <input asp-for="CookTime" type="time" class="form-control" placeholder="Enter cook time" />
+                            <label asp-for="CookTime" class="font-weight-bold">Cook Time (HH:mm)</label>
+                            <input asp-for="CookTime" type="time" class="form-control"/>
                             <span asp-validation-for="CookTime" class="text-danger"></span>
                         </div>
 
@@ -188,8 +188,10 @@
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
-    
+
     <script>
+
+
         $(document).ready(function () {
             $('textarea:not(.exclude)').summernote({
                 toolbar: [

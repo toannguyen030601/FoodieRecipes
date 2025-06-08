@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FoodieHub.MVC.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace FoodieHub.MVC.Models.Recipe
 {
@@ -32,7 +33,8 @@ namespace FoodieHub.MVC.Models.Recipe
         public IFormFile File { get; set; } = default!;
 
         [Required(ErrorMessage = "Cook time is required.")]
-        public TimeOnly CookTime { get; set; }
+        [TimeRangeValidation("00:01", "23:59", ErrorMessage = "Cook time must be between 00:01 and 23:59.")]
+        public TimeOnly? CookTime { get; set; }
 
         [Required(ErrorMessage = "Serves is required.")]
         [Range(1, int.MaxValue, ErrorMessage = "Serves must be greater than 0.")]
