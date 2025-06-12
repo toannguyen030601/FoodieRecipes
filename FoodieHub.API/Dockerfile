@@ -4,9 +4,9 @@ EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ../ .                           # quan trọng: copy cả solution
-WORKDIR /src/FoodieHub.API
+COPY ["FoodieHub.API.csproj", "./"]
 RUN dotnet restore "FoodieHub.API.csproj"
+COPY . .
 RUN dotnet build "FoodieHub.API.csproj" -c Release -o /app/build
 
 FROM build AS publish
