@@ -5,16 +5,15 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy .csproj files trước để tận dụng Docker layer caching
-COPY ["FoodieHub.API.csproj", "./"]
-# Copy các project dependencies nếu có
-# COPY ["../FoodieHub.Data/FoodieHub.Data.csproj", "FoodieHub.Data/"]
+# Sửa đường dẫn vì build từ root
+COPY ["FoodieHub.API/FoodieHub.API.csproj", "FoodieHub.API/"]
 
 # Restore packages
-RUN dotnet restore "FoodieHub.API.csproj"
+RUN dotnet restore "FoodieHub.API/FoodieHub.API.csproj"
 
-# Copy toàn bộ source code (bao gồm cả wwwroot)
-COPY . .
+# Copy toàn bộ source code của API
+COPY FoodieHub.API/ FoodieHub.API/
+WORKDIR /src/FoodieHub.API
 
 # Build project
 RUN dotnet build "FoodieHub.API.csproj" -c Release -o /app/build
