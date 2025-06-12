@@ -1,3 +1,4 @@
+
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 8080
@@ -5,17 +6,17 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy .csproj file (build context từ trong folder FoodieHub.MVC)
-COPY ["FoodieHub.MVC.csproj", "./"]
-
-# Nếu có reference đến project khác, uncomment và sửa đường dẫn
-# COPY ["../FoodieHub.Data/FoodieHub.Data.csproj", "FoodieHub.Data/"]
+# Copy .csproj file (build từ root, tìm trong folder FoodieHub.MVC)
+COPY ["FoodieHub.MVC/FoodieHub.MVC.csproj", "FoodieHub.MVC/"]
 
 # Restore packages
-RUN dotnet restore "FoodieHub.MVC.csproj"
+RUN dotnet restore "FoodieHub.MVC/FoodieHub.MVC.csproj"
 
-# Copy toàn bộ source code
-COPY . .
+# Copy toàn bộ source code của MVC
+COPY FoodieHub.MVC/ FoodieHub.MVC/
+
+# Set working directory
+WORKDIR /src/FoodieHub.MVC
 
 # Build project
 RUN dotnet build "FoodieHub.MVC.csproj" -c Release -o /app/build
