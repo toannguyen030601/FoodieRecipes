@@ -169,7 +169,7 @@
                             <div class="card-more-delicious-item">
                                 <a href="@Url.Action("Detail", "Recipes", new { id = recipe.RecipeID })">
                                     <div class="card-more-delicious-item-content">
-                                        <img class="img-fluid" alt="@recipe.Title" src="@(url + "images/" + recipe.ImageURL)" />
+                                        <img class="img-fluid" alt="@recipe.Title" src="@recipe.ImageURL" />
                                         <div class="badges">
                                             <span class="badge time">
                                                 <i class="far fa-clock"></i> @recipe.CookTime.ToString("HH:mm") min
@@ -186,7 +186,7 @@
                                 </a>
                                 <div class="card-more-delicious-item-footer">
                                     <div class="author">
-                                        <img alt="avatar" src="@($"{url}images/{recipe.Avatar}")" class="rounded-circle" style="object-fit: cover;" />
+                                        <img alt="avatar" src="@recipe.Avatar" class="rounded-circle" style="object-fit: cover;" />
                                         <span>@recipe.FullName</span>
                                     </div>
                                     <div class="rating">

@@ -97,7 +97,7 @@
                                 <tr>
                                     <td>@item.ProductID</td>
                                     <td>
-                                        <img src="@($"{apiUrl}Images/{item.MainImage}")" alt="Product Image" width="40" height="40" />
+                                        <img src="@item.MainImage" alt="Product Image" width="40" height="40" />
                                     </td>
                                     <td>@item.ProductName</td>
                                     <td>@item.Price.ToString("0.00")$</td>
@@ -214,7 +214,7 @@
                                     <tr>
                                         <td>@item.ProductID</td>
                                         <td>
-                                            <img src="@($"{apiUrl}Images/{item.MainImage}")" alt="Product Image" width="40" height="40" />
+                                            <img src="@item.MainImage" alt="Product Image" width="40" height="40" />
                                         </td>
                                         <td>@item.ProductName</td>
                                         <td>@item.Price.ToString("0.00")$</td>
@@ -327,7 +327,7 @@
                                     <tr>
                                         <td>@item.ProductID</td>
                                         <td>
-                                            <img src="@($"{apiUrl}Images/{item.MainImage}")" alt="Product Image" width="50" height="50" />
+                                            <img src="@item.MainImage" alt="Product Image" width="50" height="50" />
                                         </td>
                                         <td>@item.ProductName</td>
                                         <td>@item.Price.ToString("0.00")$</td>
@@ -416,7 +416,7 @@
                         <!-- Cột 1: Product Image -->
                         <div class="col-md-4 text-center">
                             <div class="product-image-admin">
-                                <img src="@($"{apiUrl}Images/{item.MainImage}")" alt="Product Image" class="img-thumbnail w-100" style="height: auto; max-height: 300px;">
+                                <img src="@item.MainImage" alt="Product Image" class="img-thumbnail w-100" style="height: auto; max-height: 300px;">
                             </div>
                         </div>
 
@@ -664,7 +664,7 @@
                                     {
                                         <div class="col-3 position-relative position-relative-img">
                                             <!-- Hình ảnh -->
-                                            <img src="@($"{apiUrl}Images/{itemImg.ImageURL}")"
+                                            <img src="@itemImg.ImageURL"
                                                  class="img-thumbnail img-details-product"
                                                  alt="Product Image">
 

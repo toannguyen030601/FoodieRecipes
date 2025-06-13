@@ -249,7 +249,7 @@
     if (avatar) {
         const url = "@Url.Content(url + "/images/")";
         document.getElementById("avatar").innerHTML =
-                `<img src="${url}${avatar}" alt="User Avatar" style="object-fit: cover;" />`;
+                `<img src="${avatar}" alt="User Avatar" style="object-fit: cover;" />`;
     } else {
         document.getElementById("avatar").innerHTML = `<i class="fa-solid fa-user"></i>`;
     }

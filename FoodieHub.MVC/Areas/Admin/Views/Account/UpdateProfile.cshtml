@@ -46,7 +46,7 @@
                         <input asp-for="File" type="file" class="form-control" accept="image/*" />
                         @if (!string.IsNullOrEmpty(Model.Avatar))
                         {
-                            <img src="@(url + "/images/" + Model.Avatar)" class="mt-2 rounded-circle" style="width: 100px; height: 100px;" alt="Avatar" />
+                            <img src="@Model.Avatar" class="mt-2 rounded-circle" style="width: 100px; height: 100px;" alt="Avatar" />
                         }
                     </div>
                 </div>

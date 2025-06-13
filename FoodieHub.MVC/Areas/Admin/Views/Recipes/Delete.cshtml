@@ -34,7 +34,7 @@
         <!-- Left Column: Recipe Details -->
         <div class="col-lg-8 mb-4">
             <div class="card shadow-sm">
-                <img src="@(url + "/images/" + Model["imageURL"]?.ToString())" alt="Recipe Image" class="card-img-top" />
+                <img src="@Model["imageURL"]?.ToString()" alt="Recipe Image" class="card-img-top" />
                 <div class="card-body">
                     <h5 class="card-title">Recipe Information</h5>
                     <ul class="list-unstyled">
@@ -57,7 +57,7 @@
             <div class="card shadow-sm mb-4 text-center author-info">
                 <div class="card-body">
                     <h5 class="card-title">Author Information</h5>
-                    <img src="@(Model["avatar"] != null ? (url + "/images/" + Model["avatar"].ToString()) : "/images/profile.jpg")"
+                    <img src="@(Model["avatar"] != null ? Model["avatar"].ToString() : "/images/profile.jpg")"
                          alt="Avatar"
                          class="rounded-circle mb-3"
                          style="width: 120px; height: 120px;" />

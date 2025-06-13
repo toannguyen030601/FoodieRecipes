@@ -357,7 +357,7 @@
                                     @foreach (var item in topSelling)
                                         {
                                             <tr>
-                                                <th scope="row"><img src="@(url+"/images/"+item.ImageUrl)" alt="@item.ProductName"></th>
+                                                <th scope="row"><img src="@item.ImageUrl" alt="@item.ProductName"></th>
                                                 <td>@item.ProductName</td>
                                                 <td>$@item.Price</td>
                                                 <td class="fw-bold">@item.Sold</td>
@@ -407,7 +407,7 @@
                                         @foreach (var item in topRevenue)
                                         {
                                             <tr>
-                                                <th scope="row"><a href="@($"/admin/products/details/{item.ProductID}")"><img src="@(url+"/images/"+item.ImageUrl)" alt="@item.ProductName"></a></th>
+                                                <th scope="row"><a href="@($"/admin/products/details/{item.ProductID}")"><img src="@item.ImageUrl" alt="@item.ProductName"></a></th>
                                                 <td><a href="@($"/admin/products/details/{item.ProductID}")" class="text-primary fw-bold">@item.ProductName</a></td>
                                                 <td>$@item.Price</td>
                                                 <td class="fw-bold">@item.Sold</td>
@@ -475,7 +475,7 @@
                                             <td>@contact.FullName</td>
                                             <td>@contact.ProductName</td>
                                             <td>
-                                                <img class="img-fluid" src="@($"{url}/images/{contact.ProductImage}")" alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;" />
+                                                <img class="img-fluid" src="@contact.ProductImage" alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;" />
                                             </td>
                                         </tr>
                                     }

@@ -43,7 +43,7 @@
                             <div class="col-12 col-md-4">
                                 <div class="card recipe-card shadow-sm">
                                     <a href="/recipes/detail/@item.RecipeID">
-                                        <img src=@(url+"images/"+item.ImageURL) class="card-img-top" alt="Recipe Image">
+                                        <img src="@item.ImageURL" class="card-img-top" alt="Recipe Image">
                                     </a>
                                     <div class="card-body">
                                         <h5 class="card-title">@item.Title</h5>
@@ -87,7 +87,7 @@
                         {
                             <div class="col-12 col-md-4">
                                 <div class="card recipe-card shadow-sm">
-                                    <img src="@($"{url}images/{item.ImageURL}")" class="card-img-top" alt="Recipe Image">
+                                    <img src="@item.ImageURL" class="card-img-top" alt="Recipe Image">
                                     <div class="card-body">
                                         <h5 class="card-title">@item.Title</h5>      
                                         <div class="recipe-stats">

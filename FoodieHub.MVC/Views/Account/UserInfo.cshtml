@@ -18,7 +18,7 @@
     <!-- Profile Section -->
     <div class="profile-header text-center mb-5">
         @if(Model.Avatar!=null){
-            <img src=@(url + "images/" + Model.Avatar) class="rounded-circle mb-3" alt="Profile Picture">
+            <img src="@Model.Avatar" class="rounded-circle mb-3" alt="Profile Picture">
         }
         else {
             <img src="~/images/profile.jpg" class="rounded-circle mb-3" alt="Profile Picture">
@@ -56,7 +56,7 @@
                         <div class="col-lg-3 col-md-4 col-6 mb-4">
                             <a href="/recipes/detail/@item.RecipeID">
                                 <div class="card h-100">
-                                    <img src="@(url + "images/" + item.ImageURL)" class="card-img-top" alt="Recipe Image">
+                                    <img src="@item.ImageURL" class="card-img-top" alt="Recipe Image">
                                     <div class="card-body text-center">
                                         <h5 class="card-title">@item.Title</h5>
                                         <p>@item.CreatedAt</p>
@@ -84,7 +84,7 @@
                         <div class="col-lg-3 col-md-4 col-6 mb-4">
                             <a href="/recipes/detail/@item.ArticleID">
                                 <div class="card h-100">
-                                    <img src="@(url + "images/" + item.MainImage)" class="card-img-top" alt="Article Image">
+                                    <img src="@item.MainImage" class="card-img-top" alt="Article Image">
                                     <div class="card-body text-center">
                                         <h5 class="card-title">@item.Title</h5>
                                         <p>@item.CreatedAt</p>

@@ -19,7 +19,7 @@
 }
 
 <div class="container-recipedetail">
-    <img alt="A plate of winter pasta with brown butter, hazelnuts, and kale" class="main-image" src="@(url + "images/" + Model.ImageURL)" width="800" />
+    <img alt="A plate of winter pasta with brown butter, hazelnuts, and kale" class="main-image" src="@Model.ImageURL" width="800" />
     <div class="main-content">
         <div class="content col-md-8 col-12">
             <div class="title">
@@ -69,7 +69,7 @@
             <div class="profile">
                 @if (Model.Avatar != null)
                 {
-                    <img src="@($"{url}images/{Model.Avatar}")" alt="User Image" class="rounded-circle me-3" style="width:40px;height:40px; object-fit: cover;">
+                    <img src="@Model.Avatar" alt="User Image" class="rounded-circle me-3" style="width:40px;height:40px; object-fit: cover;">
                 }
                 else
                 {
@@ -153,7 +153,7 @@
                         @if (!string.IsNullOrEmpty(item.value.ImageURL))
                         {
                             <div class="image-container">
-                                <img src="@(url + "images/" + item.value.ImageURL)" class="img-fluid mb-2 rounded shadow-sm " alt="Step Image" height="400" width="600">
+                                <img src="@item.value.ImageURL" class="img-fluid mb-2 rounded shadow-sm " alt="Step Image" height="400" width="600">
                             </div>
                             <div>
                                 <p>@Html.Raw(item.value.Directions)</p>
@@ -185,7 +185,7 @@
                             <div class="time-label">
                                 <i class="far fa-clock"></i> @recipe.CookTime.ToString("HH:mm") min
                             </div>
-                            <img alt="@recipe.Title" src="@(url + "images/" + recipe.ImageURL)" />
+                            <img alt="@recipe.Title" src="@recipe.ImageURL" />
                             <div class="item-title">@recipe.Title</div>
                         </a>
                     }
@@ -216,7 +216,7 @@
                                         <div class="card-more-delicious-item">
                                             <a href="@Url.Action("Detail", "Recipes", new { id = recipe.RecipeID })">
                                                 <div class="card-more-delicious-item-content">
-                                                    <img class="img-fluid" alt="@recipe.Title" src="@(url + "images/" + recipe.ImageURL)" />
+                                                    <img class="img-fluid" alt="@recipe.Title" src="@recipe.ImageURL" />
                                                     <div class="badges">
                                                         <span class="badge time">
                                                             <i class="far fa-clock"></i> @recipe.CookTime.ToString("HH:mm") min
@@ -233,7 +233,7 @@
                                             </a>
                                             <div class="card-more-delicious-item-footer">
                                                 <div class="author">
-                                                    <img alt="avatar" src="@($"{url}images/{recipe.Avatar}")" class="rounded-circle" style="object-fit: cover;" />
+                                                    <img alt="avatar" src="@recipe.Avatar" class="rounded-circle" style="object-fit: cover;" />
                                                     <span>@recipe.FullName</span>
                                                 </div>
                                                 <div class="rating">
@@ -296,7 +296,7 @@
                 <div id="comment-@comment.CommentID" class="d-flex align-items-center mb-4 bg-light p-3 rounded shadow-sm position-relative">
                     @if (comment.Avatar != null)
                     {
-                        <img src="@($"{url}images/{comment.Avatar}")" alt="Avatar" class="rounded-circle me-3" style="width:30px;height:30px; object-fit: cover;">
+                        <img src="@comment.Avatar" alt="Avatar" class="rounded-circle me-3" style="width:30px;height:30px; object-fit: cover;">
                     }
                     else
                     {

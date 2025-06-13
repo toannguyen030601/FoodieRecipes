@@ -70,14 +70,14 @@
     <div class="row">
         <div class="col-md-5">
             <div class="main-image mb-3">
-                <img id="mainImage" src="@($"{apiUrl}Images/{@Model.Data.MainImage}")" alt="Stackable Bodega Glass" class="img-fluid rounded">
+                <img id="mainImage" src="@Model.Data.MainImage" alt="Stackable Bodega Glass" class="img-fluid rounded">
             </div>
 
 
             <div class="thumbnails">
                 <div class="row g-2">
                     <div class="col-3">
-                        <img src="@($"{apiUrl}Images/{@Model.Data.MainImage}")"
+                        <img src="@Model.Data.MainImage" )"
                              alt="Thumbnail"
                              class="rounded border thumbnail-image"
                              height="80"
@@ -90,7 +90,7 @@
                         {
 
                             <div class="col-3">
-                                <img src="@($"{apiUrl}Images/{item.ImageURL}")"
+                                <img src="@item.ImageURL" )"
                                      alt="Thumbnail"
                                      class="rounded border thumbnail-image"
                                      height="80"
@@ -259,7 +259,7 @@
                 <div class="col-md-3 mb-4">
                     <div class="product-card">
                         <div class="product-image">
-                            <img src="@($"{apiUrl}Images/{item.MainImage}")" alt="Product Image">
+                            <img src="@item.MainImage" alt="Product Image">
                         </div>
                         <div class="product-title">@item.ProductName</div>
 
@@ -443,7 +443,10 @@
                             </div>
 
                             <div class="review-author">
-                                <img src="@($"{apiUrl}Images/{item?.Avatar ?? "default-avatar.png"}")" alt="Reviewer Avatar" class="rounded-circle" style="width: 50px; height: 50px;">
+                                <img src="@(string.IsNullOrEmpty(item?.Avatar) ? $"{apiUrl}Images/default-avatar.png" : item.Avatar)"
+                                     alt="Reviewer Avatar"
+                                     class="rounded-circle"
+                                     style="width: 50px; height: 50px;" />
                                 <span>@(item?.UserName ?? "Anonymous")</span>
                             </div>
 
@@ -499,7 +502,10 @@
                                 </div>
 
                                 <div class="review-author">
-                                    <img src="@($"{apiUrl}Images/{item.Avatar ?? "default-avatar.png"}")" alt="Reviewer Avatar" style="width: 50px; height: 50px;" class="rounded-circle">
+                                    <img src="@(string.IsNullOrEmpty(item?.Avatar) ? $"{apiUrl}Images/default-avatar.png" : item.Avatar)"
+                                         alt="Reviewer Avatar"
+                                         class="rounded-circle"
+                                         style="width: 50px; height: 50px;" />
                                     <span>@(item.UserName ?? "Anonymous")</span>
                                 </div>
 
@@ -554,7 +560,10 @@
                                 </div>
 
                                 <div class="review-author">
-                                    <img src="@($"{apiUrl}Images/{item.Avatar ?? "default-avatar.png"}")" alt="Reviewer Avatar" style="width: 50px; height: 50px;" class="rounded-circle">
+                                    <img src="@(string.IsNullOrEmpty(item?.Avatar) ? $"{apiUrl}Images/default-avatar.png" : item.Avatar)"
+                                         alt="Reviewer Avatar"
+                                         class="rounded-circle"
+                                         style="width: 50px; height: 50px;" />
                                     <span>@(item.UserName ?? "Anonymous")</span>
                                 </div>
 
@@ -609,7 +618,10 @@
                                 </div>
 
                                 <div class="review-author">
-                                    <img src="@($"{apiUrl}Images/{item.Avatar ?? "default-avatar.png"}")" alt="Reviewer Avatar" style="width: 50px; height: 50px;" class="rounded-circle">
+                                    <img src="@(string.IsNullOrEmpty(item?.Avatar) ? $"{apiUrl}Images/default-avatar.png" : item.Avatar)"
+                                         alt="Reviewer Avatar"
+                                         class="rounded-circle"
+                                         style="width: 50px; height: 50px;" />
                                     <span>@(item.UserName ?? "Anonymous")</span>
                                 </div>
 
@@ -663,7 +675,10 @@
                                 </div>
 
                                 <div class="review-author">
-                                    <img src="@($"{apiUrl}Images/{item.Avatar ?? "default-avatar.png"}")" alt="Reviewer Avatar" style="width: 50px; height: 50px;" class="rounded-circle">
+                                    <img src="@(string.IsNullOrEmpty(item?.Avatar) ? $"{apiUrl}Images/default-avatar.png" : item.Avatar)"
+                                         alt="Reviewer Avatar"
+                                         class="rounded-circle"
+                                         style="width: 50px; height: 50px;" />
                                     <span>@(item.UserName ?? "Anonymous")</span>
                                 </div>
 
@@ -717,7 +732,10 @@
                                 </div>
 
                                 <div class="review-author">
-                                    <img src="@($"{apiUrl}Images/{item.Avatar ?? "default-avatar.png"}")" alt="Reviewer Avatar" style="width: 50px; height: 50px;" class="rounded-circle">
+                                    <img src="@(string.IsNullOrEmpty(item?.Avatar) ? $"{apiUrl}Images/default-avatar.png" : item.Avatar)"
+                                         alt="Reviewer Avatar"
+                                         class="rounded-circle"
+                                         style="width: 50px; height: 50px;" />
                                     <span>@(item.UserName ?? "Anonymous")</span>
                                 </div>
 

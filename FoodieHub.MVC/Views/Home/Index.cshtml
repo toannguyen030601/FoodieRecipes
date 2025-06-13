@@ -95,7 +95,7 @@
                 <div class="card border-0">
                     <!-- Hình ảnh sản phẩm -->
                     <div class="position-relative">
-                        <img src="@($"{apiUrl}Images/{topSellingProduct.MainImage}")" class="card-img-top img-fluid rounded-top" alt="@topSellingProduct.ProductName" style="height: 400px; object-fit: cover;">
+                        <img src="@topSellingProduct.MainImage" class="card-img-top img-fluid rounded-top" alt="@topSellingProduct.ProductName" style="height: 400px; object-fit: cover;">
                        <span class="badge bg-danger position-absolute top-0 start-0 px-3 py-1 rounded-bottom-end">Best Seller This Month</span>
 
                     </div>
@@ -155,7 +155,7 @@
                         <div class="card recipe-card shadow-sm">
                             <div class="card-body">
                                 <div class="image-container">
-                                    <img src=@(apiUrl+"images/"+recipe.ImageURL) class="card-img-top" alt="Recipe Image">
+                                    <img src="@recipe.ImageURL" class="card-img-top" alt="Recipe Image">
                                     <div class="badges">
                                         <span class="badge time">
                                             <i class="far fa-clock"></i> @recipe.CookTime.ToString(@"HH\:mm") min
@@ -228,7 +228,7 @@
 
                 <!-- Ảnh sản phẩm -->
                 <a asp-action="Detail" asp-controller="Products" asp-route-id="@item.ProductID" class="">
-                    <img src="@($"{apiUrl}Images/{item.MainImage}")" class="card-img-top" alt="@item.ProductName">
+                    <img src="@item.MainImage" class="card-img-top" alt="@item.ProductName">
                 </a>
 
                 <!-- Nội dung card -->

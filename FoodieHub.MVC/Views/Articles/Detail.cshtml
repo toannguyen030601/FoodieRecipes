@@ -24,7 +24,7 @@
         </div>
 
         <div class="col-md-6">
-            <img src="@($"{url}/images/{Model.MainImage}")" alt="Article" class="img-fluid mb-3">
+            <img src="@Model.MainImage" alt="Article" class="img-fluid mb-3">
 
             <p>@Html.Raw(@Model.Description)</p>
         </div>
@@ -51,7 +51,7 @@
                     <p class="mb-0"><strong>Recipe By: <br></strong>
                         @if (Model.Avatar != null)
                         {
-                            <img src="@($"{url}images/{Model.Avatar}")" alt="User Image" class="rounded-circle me-3" style="width:50px;height:50px">
+                            <img src="@Model.Avatar" alt="User Image" class="rounded-circle me-3" style="width:50px;height:50px">
                         }
                         else
                         {
@@ -85,7 +85,7 @@
                 <div class="d-flex align-items-center mb-4 bg-light p-3 rounded shadow-sm position-relative">
                     @if (comment.Avatar != null)
                     {
-                        <img src="@($"{url}images/{comment.Avatar}")" alt="Avatar" class="rounded-circle me-3" style="width:50px;height:50px">
+                        <img src="@comment.Avatar" alt="Avatar" class="rounded-circle me-3" style="width:50px;height:50px">
                     }
                     else
                     {

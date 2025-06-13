@@ -21,7 +21,7 @@
             @if (Model.TopArticles.Count() > 0)
             {
                 <div class="card shadow-sm border-0">
-                    <img src="@($"{url}/images/{Model.TopArticles.First().MainImage}")" alt="Feature Article Image" class="card-img-top">
+                    <img src="@Model.TopArticles.First().MainImage" alt="Feature Article Image" class="card-img-top">
                     <div class="card-body">
                         <p class="text-muted">Favorite Article</p>
                         <h3 class="card-title">
@@ -83,7 +83,7 @@
                         @if (category.FeatureArticle != null)
                         {
                             <div class="card shadow-sm border-0">
-                                <img src="@($"{url}/images/{category.FeatureArticle.MainImage}")" alt="Feature Article Image" class="card-img-top">
+                                <img src="@category.FeatureArticle.MainImage" alt="Feature Article Image" class="card-img-top">
                                 <div class="card-body">
                                     <p class="text-muted">@category.FeatureArticle.CreatedAt.ToString("dd/MM/yyyy hh:mm:ss")</p>
                                     <h3 class="card-title">
@@ -117,7 +117,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-4">
-                                            <img src="@($"{url}/images/{article.MainImage}")" alt="Article Image" class="img-fluid rounded-end">
+                                            <img src="@article.MainImage" alt="Article Image" class="img-fluid rounded-end">
                                         </div>
                                     </div>
                                 </div>
@@ -157,7 +157,7 @@
         {
             <div class="col-md-3 mb-4">
                 <div class="profile-card text-center">
-                    <img src=@(item.Avatar!=null? url+"images/"+item.Avatar: "~/images/profile.jpg") alt="Resident" class="profile-image rounded-circle">
+                    <img src=@(item.Avatar!=null? item.Avatar: "~/images/profile.jpg") alt="Resident" class="profile-image rounded-circle">
                     <div class="info-box mt-3">
                         <p class="username">@item.Fullname</p>
                         <a href="/account/userinfo/@item.Id" class="btn btn-outline-secondary btn-sm">View Profile</a>

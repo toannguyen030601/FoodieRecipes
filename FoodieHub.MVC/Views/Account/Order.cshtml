@@ -45,7 +45,7 @@
                                     <td>@order.Status</td>
                                     <td>@order.TotalAmount.ToString("F2") $</td>
                                     <td>
-                                        <img src=@(url+"/"+order.QRCode) alt="QR Code" class="img-fluid" style="width:50px;height:50px" />
+                                        <img src="@(url+"/"+order.QRCode)" alt="QR Code" class="img-fluid" style="width:50px;height:50px" />
                                     </td>
                                     <td>
                                         <a href="@Url.Action("OrderDetail", "Account", new { id = order.OrderID })" class="button button-dark rounded-2">View</a>

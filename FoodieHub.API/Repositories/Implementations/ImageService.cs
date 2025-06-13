@@ -25,7 +25,7 @@ namespace FoodieHub.API.Repositories.Implementations
             try
             {
                 // Tạo thư mục nếu chưa tồn tại
-                var directory = Path.GetDirectoryName(dto.FilePath);
+                /*var directory = Path.GetDirectoryName(dto.FilePath);
                 if (!Directory.Exists(directory) && directory!=null)
                 {
                     Directory.CreateDirectory(directory);
@@ -35,7 +35,7 @@ namespace FoodieHub.API.Repositories.Implementations
                 using (var stream = new FileStream(dto.FilePath, FileMode.Create))
                 {
                     await dto.File.CopyToAsync(stream);
-                }
+                }*/
 
                 return true;
             }

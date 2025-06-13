@@ -1,48 +1,53 @@
-﻿using FoodieHub.API.Models.Response;
+﻿using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
+using FoodieHub.API.Models.Response;
 
 namespace FoodieHub.API.Extentions
 {
     public class ImageExtentions
     {
-        private readonly IWebHostEnvironment _environment;
+        private readonly Cloudinary _cloudinary;
 
-        public ImageExtentions(IWebHostEnvironment environment)
+        public ImageExtentions(IConfiguration configuration)
         {
-            _environment = environment;
+            var cloudName = configuration["Cloudinary:CloudName"];
+            var apiKey = configuration["Cloudinary:ApiKey"];
+            var apiSecret = configuration["Cloudinary:ApiSecret"];
+            _cloudinary = new Cloudinary(new Account(cloudName, apiKey, apiSecret));
         }
 
         public async Task<UploadImageResult> UploadImage(IFormFile file, string folder)
         {
-            if (IsValidImage(file))
+            if (!IsValidImage(file))
             {
-                var fileExtention = Path.GetExtension(file.FileName);
-
-                string newfileName = DateTime.Now.Ticks.ToString() + fileExtention;
-                string filePath = Path.Combine(_environment.WebRootPath, "Images", folder, newfileName);
-
-                // Kiểm tra xem thư mục đã tồn tại chưa, nếu chưa thì tạo
-                if (!Directory.Exists(Path.Combine(_environment.WebRootPath, "Images", folder)))
+                return new UploadImageResult
                 {
-                    Directory.CreateDirectory(Path.Combine(_environment.WebRootPath, "Images", folder));
-                }
+                    Success = false,
+                    Message = "Invalid Image"
+                };
+            }
 
-                // Lưu file vào đường dẫn
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(fileStream);
-                }
+            using var stream = file.OpenReadStream();
+            var uploadParams = new ImageUploadParams
+            {
+                File = new FileDescription(file.FileName, stream),
+                Folder = folder
+            };
+            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
 
+            if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
+            {
                 return new UploadImageResult
                 {
                     Success = true,
                     Message = "Upload file success",
-                    FilePath = Path.Combine(folder, newfileName)
+                    FilePath = uploadResult.SecureUrl.ToString()
                 };
             }
             return new UploadImageResult
             {
                 Success = false,
-                Message = "Invalid Image"
+                Message = uploadResult.Error?.Message
             };
         }
         public async Task<string> SaveImageFromBytesAsync(byte[] imageBytes, string fileName)
@@ -69,35 +74,38 @@ namespace FoodieHub.API.Extentions
 
         public async Task<UploadImageResult> UploadMutipleImages(List<IFormFile> files, string folder)
         {
+            var listFilePath = new List<string>();
             foreach (var file in files)
             {
                 if (!IsValidImage(file))
+                {
                     return new UploadImageResult
                     {
                         Success = false,
                         Message = "Invalid Image"
                     };
-            }
-            var listFilePath = new List<string>();
-            foreach (var file in files)
-            {
-                var fileExtention = Path.GetExtension(file.FileName);
-
-                string newfileName = DateTime.Now.Ticks.ToString() + fileExtention;
-                string filePath = Path.Combine(_environment.WebRootPath, "Images", folder, newfileName);
-
-                // Kiểm tra xem thư mục đã tồn tại chưa, nếu chưa thì tạo
-                if (!Directory.Exists(Path.Combine(_environment.WebRootPath, "Images", folder)))
-                {
-                    Directory.CreateDirectory(Path.Combine(_environment.WebRootPath, "Images", folder));
                 }
 
-                // Lưu file vào đường dẫn
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                using var stream = file.OpenReadStream();
+                var uploadParams = new ImageUploadParams
                 {
-                    await file.CopyToAsync(fileStream);
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = folder
+                };
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    listFilePath.Add(uploadResult.SecureUrl.ToString());
                 }
-                listFilePath.Add(Path.Combine(folder, newfileName));
+                else
+                {
+                    return new UploadImageResult
+                    {
+                        Success = false,
+                        Message = uploadResult.Error?.Message
+                    };
+                }
             }
             return new UploadImageResult
             {
@@ -107,37 +115,67 @@ namespace FoodieHub.API.Extentions
             };
         }
 
-        public void DeleteImage(string filePath)
+        public void DeleteImage(string imageUrl)
         {
-            var fullPath = Path.Combine(_environment.WebRootPath, "Images", filePath);
-
-            // Kiểm tra xem tệp có tồn tại không
-            if (File.Exists(fullPath))
+            try
             {
-                File.Delete(fullPath);  // Xóa tệp nếu tồn tại
+                if (string.IsNullOrEmpty(imageUrl))
+                    return;
+
+                var uri = new Uri(imageUrl);
+                var segments = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+                // Tìm "upload", vì sau đó là phần publicId
+                var uploadIndex = Array.FindIndex(segments, s => s.Equals("upload", StringComparison.OrdinalIgnoreCase));
+                if (uploadIndex == -1 || uploadIndex + 1 >= segments.Length)
+                    return;
+
+                // Lấy phần sau "upload/"
+                var afterUpload = segments.Skip(uploadIndex + 1).ToList();
+
+                // Bỏ version nếu có (vd: v1718000000)
+                if (afterUpload[0].StartsWith("v"))
+                    afterUpload.RemoveAt(0);
+
+                // Nối lại: "Users/avatar123.jpg" => "Users/avatar123"
+                var publicIdWithExt = string.Join('/', afterUpload); // Users/avatar.jpg
+                var publicId = Path.Combine(Path.GetDirectoryName(publicIdWithExt) ?? "", Path.GetFileNameWithoutExtension(publicIdWithExt))
+                                   .Replace("\\", "/");
+
+                // Xóa ảnh
+                var deletionParams = new DeletionParams(publicId);
+                var result = _cloudinary.Destroy(deletionParams);
+
+                // (Optional) log kết quả
+                Console.WriteLine($"DeleteImage: publicId={publicId}, result={result.Result}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("DeleteImage error: " + ex.Message);
+                // Có thể log vào file / hệ thống log nếu muốn
             }
         }
 
 
-        public async Task<bool> UploadImageByName(IFormFile file,string folder, string fileName)
+        public async Task<bool> UploadImageByName(IFormFile file, string folder, string fileName)
         {
-            if (!IsValidImage(file)) return false;         
+            if (!IsValidImage(file)) return false;
             try
             {
-                var fileExtention = Path.GetExtension(file.FileName);
-                string filePath = Path.Combine(_environment.WebRootPath, "Images", folder, fileName);
-
-                if (!Directory.Exists(Path.Combine(_environment.WebRootPath, "Images", folder)))
+                using var stream = file.OpenReadStream();
+                var uploadParams = new ImageUploadParams
                 {
-                    Directory.CreateDirectory(Path.Combine(_environment.WebRootPath, "Images", folder));
-                }
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(fileStream);
-                }
-                return true;
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = folder,
+                    PublicId = fileName
+                };
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+                return uploadResult.StatusCode == System.Net.HttpStatusCode.OK;
             }
-            catch{return false;}                
+            catch
+            {
+                return false;
+            }
         }
 
 

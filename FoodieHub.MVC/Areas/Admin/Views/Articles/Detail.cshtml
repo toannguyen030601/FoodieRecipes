@@ -22,7 +22,7 @@
         <!-- Left column: Image, Title, and Content -->
         <div class="col-lg-8 mb-4">
             <div class="card shadow-sm">
-                <img src="@(url + "/images/" + Model.MainImage)" alt="Image" class="card-img-top" />
+                <img src="@Model.MainImage" alt="Image" class="card-img-top" />
                 <div class="card-body">
                     <h5 class="card-title">Content</h5>
                     <div class="article-description mb-3">
@@ -37,9 +37,9 @@
             <div class="card shadow-sm mb-4 text-center author-info">
                 <div class="card-body">
                     <h5 class="card-title">Author Information</h5>
-              
-                   <img src="@(Model.Avatar != null ? (url + "/images/" + Model.Avatar) : "/images/profile.jpg")" 
-                     alt="Avatar" 
+
+                    <img src="@(Model.Avatar != null ? Model.Avatar : "/images/profile.jpg")"
+                         alt="Avatar" 
                      class="rounded-circle mb-3" 
                      style="width: 120px; height: 120px;" />
 

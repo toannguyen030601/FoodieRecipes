@@ -77,7 +77,7 @@
                 {
                     <tr>
                         <td>@item.ProductName</td>
-                        <td><img src="@($"{url}/images/{item.ProductImage}")" alt="Product Image" class="img-thumbnail" style="width:50px;height:50px" /></td>
+                        <td><img src="@item.ProductImage" alt="Product Image" class="img-thumbnail" style="width:50px;height:50px" /></td>
                         <td>@item.Quantity</td>
                         <td>$ @(item.UnitPrice*(100-item.Discount)/100)</td>
                         <td>$ @item.TotalPrice</td>

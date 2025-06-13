@@ -33,7 +33,7 @@
         @foreach (var item in Model.ProductForOrder)
         {
             <div class="order-summary d-flex align-items-center mb-3">
-                <img src="@($"{url}images/{item.ProductImage}")" alt="Product Image" />
+                <img src="@item.ProductImage" alt="Product Image" />
                 <div class="item-details">
                     <p>@item.ProductName</p>
                     <p>Quantity: @item.Quantity</p>

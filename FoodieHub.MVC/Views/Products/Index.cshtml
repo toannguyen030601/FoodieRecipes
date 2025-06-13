@@ -5,7 +5,7 @@
 @inject IReviewService _reviewService;
 @inject IOrderService _orderDetailsService;
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Shopping";
     Layout = "~/Views/Shared/_Layout.cshtml"; 
     var apiUrl = Configuration["BaseHost"];
     var listCate =  _categoryService.GetAll();
@@ -122,7 +122,7 @@
                         <div class="product-card p-3 shadow-sm position-relative">
                             <a asp-action="Detail" asp-controller="Products" asp-route-id="@item.ProductID" class="d-block">
                                 <div class="product-image-container">
-                                    <img src="@($"{apiUrl}Images/{item.MainImage}")"
+                                    <img src="@item.MainImage" )"
                                          alt="Product Image"
                                          class="product-image img-fluid"
                                          onerror="this.onerror=null; this.src='/images/user-logo-test.png';" />
