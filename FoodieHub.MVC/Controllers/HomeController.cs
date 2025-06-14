@@ -1,4 +1,5 @@
-﻿using FoodieHub.MVC.Helpers;
+﻿using FoodieHub.MVC.Attributes;
+using FoodieHub.MVC.Helpers;
 using FoodieHub.MVC.Models.QueryModel;
 using FoodieHub.MVC.Service.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -15,7 +16,7 @@ namespace FoodieHub.MVC.Controllers
             this.authService = authService;
             this.recipeService = recipeService;
         }
-
+        
         public async Task<IActionResult> Index()
         {
             var token = Request.GetCookie("TokenUser");

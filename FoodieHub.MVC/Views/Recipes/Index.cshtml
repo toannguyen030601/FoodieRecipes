@@ -20,7 +20,9 @@
     <link rel="stylesheet" href="~/css/Recipes.css" asp-append-version="true">
 }
 
+
 <div class="container py-5">
+    @await Html.PartialAsync("~/Views/Shared/_Breadcrumb.cshtml")
     <h2 class="text-center mb-5">Recipe List</h2>
 
     <!-- Filter and Search Options -->

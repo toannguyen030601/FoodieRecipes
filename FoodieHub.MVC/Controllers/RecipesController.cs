@@ -7,6 +7,8 @@ using FoodieHub.MVC.Helpers;
 using FoodieHub.MVC.Models.Comment;
 using FoodieHub.MVC.Models.QueryModel;
 using AspNetCoreHero.ToastNotification.Abstractions;
+using FoodieHub.MVC.Attributes;
+using FoodieHub.MVC.Models.Breadcrumb;
 
 namespace FoodieHub.MVC.Controllers
 {
@@ -108,8 +110,6 @@ namespace FoodieHub.MVC.Controllers
             }
             return View(update);
         }
-
-
         public async Task<IActionResult> Index(QueryRecipeModel query)
         {
             query.IsActive = true;
@@ -129,6 +129,7 @@ namespace FoodieHub.MVC.Controllers
                 NotificationHelper.SetErrorNotification(this, "Not found this recipe");
                 return RedirectToAction("Index");
             }
+            BreadcrumbHelper.SetBreadcrumb(this, $"Recipes/{data.CategoryName}", data.Title);
 
             // Lấy danh sách bài viết liên quan
             var relatedRecipesResult = await _recipeService.GetAll(new QueryRecipeModel

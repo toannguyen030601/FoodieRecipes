@@ -19,6 +19,7 @@
 }
 
 <div class="container-recipedetail">
+    @await Html.PartialAsync("~/Views/Shared/_Breadcrumb.cshtml")
     <img alt="A plate of winter pasta with brown butter, hazelnuts, and kale" class="main-image" src="@Model.ImageURL" width="800" />
     <div class="main-content">
         <div class="content col-md-8 col-12">

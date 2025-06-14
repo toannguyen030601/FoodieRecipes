@@ -1,0 +1,23 @@
+﻿@using FoodieHub.MVC.Models.Breadcrumb
+@{
+    var breadcrumb = ViewData["Breadcrumb"] as BreadcrumbModel;
+}
+
+@if (breadcrumb != null && !string.IsNullOrEmpty(breadcrumb.Path))
+{
+    var segments = breadcrumb.Path.Split('/');
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            @foreach(var segment in segments){
+                <li class="breadcrumb-item">
+                    @segment
+                </li>
+            }
+
+            <li class="breadcrumb-item" aria-current="page">
+                <span class="fw-bold">@breadcrumb.Title</span>
+            </li>
+        </ol>
+    </nav>
+}
