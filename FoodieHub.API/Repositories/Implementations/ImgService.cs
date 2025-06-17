@@ -24,93 +24,79 @@ namespace FoodieHub.API.Repositories.Implementations
 
         public async Task<ServiceResponse> AddImage(ProductImageDTO img)
         {
-            var uploadImageResult = await _uploadImageHelper.UploadImage(img.ImageURL, "Products");
+            var uploadImageResult = await _uploadImageHelper.UploadImage(img.ImageURL, "ProductDetail");
 
-            if (!uploadImageResult.Success)
+            if (!uploadImageResult.Success || string.IsNullOrEmpty(uploadImageResult.FilePath))
             {
                 return new ServiceResponse
                 {
-                    Success =false,
-                    Message = "Failed to upload img to folder.",
-                    StatusCode = 201
-
+                    Success = false,
+                    Message = "Failed to upload image to Cloudinary.",
+                    StatusCode = 400
                 };
             }
-           
-            var obj = _mapper.Map<ProductImage>(img);
-            obj.ProductID =img.ProductID;
-            obj.ImageURL = uploadImageResult.FilePath.ToString();
-            await _appDbContext.AddAsync(obj);
+
+            var productImage = _mapper.Map<ProductImage>(img);
+            productImage.ProductID = img.ProductID;
+            productImage.ImageURL = uploadImageResult.FilePath;
+
+            await _appDbContext.ProductImages.AddAsync(productImage);
             var result = await _appDbContext.SaveChangesAsync();
+
             if (result > 0)
             {
                 return new ServiceResponse
                 {
                     Success = true,
-                    Message = "Add new img successfully.",
+                    Message = "Image added successfully.",
                     StatusCode = 201
                 };
             }
-            else
-            {
-                return new ServiceResponse
-                {
-                    Success = false,
-                    Message = "Failed to add new img.",
-                    StatusCode = 400
 
-                };
-            }
+            return new ServiceResponse
+            {
+                Success = false,
+                Message = "Failed to save image to database.",
+                StatusCode = 500
+            };
         }
 
         public async Task<ServiceResponse> AddMultipleImages(List<ProductImageDTO> imgs)
         {
-            var uploadedImages = new List<ProductImageDTO>();
-
-            foreach (var img in imgs)
-            {
-                
-                var uploadImageResult = await _uploadImageHelper.UploadMutipleImages((List<IFormFile>)img.ImageURL, "Products");
-
-                if (!uploadImageResult.Success)
-                {
-                    return new ServiceResponse
-                    {
-                        Success = false,
-                        Message = $"Failed to upload image for index {imgs.IndexOf(img)}.",
-                        StatusCode = 201
-                    };
-                }
-
-                // Chuyển đổi và lưu thông tin hình ảnh vào cơ sở dữ liệu
-                var obj = _mapper.Map<ProductImage>(img);
-                obj.ProductID = img.ProductID;
-                obj.ImageURL = uploadImageResult.FilePath.ToString(); 
-
-                await _appDbContext.AddAsync(obj);
-                uploadedImages.Add(_mapper.Map<ProductImageDTO>(obj)); 
-            }
-
-            var result = await _appDbContext.SaveChangesAsync();
-
-            if (result > 0)
-            {
-                return new ServiceResponse
-                {
-                    Success = true,
-                    Message = "Added new images successfully.",
-                    StatusCode = 201
-                };
-            }
-            else
+            if (imgs == null || !imgs.Any())
             {
                 return new ServiceResponse
                 {
                     Success = false,
-                    Message = "Failed to add new images.",
+                    Message = "No images provided.",
                     StatusCode = 400
                 };
             }
+
+            int successCount = 0;
+
+            foreach (var img in imgs)
+            {
+                var uploadImageResult = await _uploadImageHelper.UploadImage(img.ImageURL, "ProductDetail");
+
+                if (!uploadImageResult.Success || string.IsNullOrEmpty(uploadImageResult.FilePath))
+                    continue;
+
+                var productImage = _mapper.Map<ProductImage>(img);
+                productImage.ImageURL = uploadImageResult.FilePath;
+
+                await _appDbContext.ProductImages.AddAsync(productImage);
+                successCount++;
+            }
+
+            await _appDbContext.SaveChangesAsync();
+
+            return new ServiceResponse
+            {
+                Success = successCount > 0,
+                Message = successCount > 0 ? $"Added {successCount} image(s)." : "Failed to upload images.",
+                StatusCode = successCount > 0 ? 201 : 500
+            };
         }
 
         public async Task<ServiceResponse> DeleteImgByProductID(int id)

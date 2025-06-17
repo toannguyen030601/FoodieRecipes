@@ -4,6 +4,6 @@
     {
         public bool Success { get; set; }
         public string Message { get; set; } = default!;
-        public object FilePath { get; set; } = default!;
+        public string FilePath { get; set; } = string.Empty;
     }
 }

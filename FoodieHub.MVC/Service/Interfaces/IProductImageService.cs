@@ -9,7 +9,7 @@ namespace FoodieHub.MVC.Service.Interfaces
         Task<List<GetProductImages>> GetAllImg();
         Task<APIResponse> AddImageProduct(ProductImageDTO image);
 
-        Task<APIResponse> AddMultipleImages(List<ProductImageDTO> images);
+        Task<APIResponse> AddMultipleImages(int productID, List<IFormFile> images);
 
         Task<APIResponse> DeleteImage(int id);
 

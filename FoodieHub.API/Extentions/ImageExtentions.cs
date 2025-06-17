@@ -16,27 +16,35 @@ namespace FoodieHub.API.Extentions
             _cloudinary = new Cloudinary(new Account(cloudName, apiKey, apiSecret));
         }
 
-        public async Task<UploadImageResult> UploadImage(IFormFile file, string folder)
+        public async Task<UploadImageResult> UploadImage(IFormFile file, string folder, string? oldImageUrl = null)
         {
             if (!IsValidImage(file))
             {
                 return new UploadImageResult
                 {
                     Success = false,
-                    Message = "Invalid Image"
+                    Message = "Invalid image."
                 };
             }
 
+            // Upload ảnh mới
             using var stream = file.OpenReadStream();
             var uploadParams = new ImageUploadParams
             {
                 File = new FileDescription(file.FileName, stream),
                 Folder = folder
             };
+
             var uploadResult = await _cloudinary.UploadAsync(uploadParams);
 
             if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
             {
+                // Xóa ảnh cũ nếu có
+                if (!string.IsNullOrEmpty(oldImageUrl))
+                {
+                    DeleteImage(oldImageUrl);
+                }
+
                 return new UploadImageResult
                 {
                     Success = true,
@@ -44,6 +52,7 @@ namespace FoodieHub.API.Extentions
                     FilePath = uploadResult.SecureUrl.ToString()
                 };
             }
+
             return new UploadImageResult
             {
                 Success = false,
@@ -111,7 +120,7 @@ namespace FoodieHub.API.Extentions
             {
                 Success = true,
                 Message = "Upload file success",
-                FilePath = listFilePath
+                FilePath = listFilePath.ToString()
             };
         }
 

@@ -212,20 +212,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
     <script>
-        //Summernote
-        $(document).ready(function () {
-            $('textarea:not(.exclude)').summernote({
-                toolbar: [
-                    ['font', ['bold', 'italic', 'underline', 'clear']],
-                    ['fontname', ['fontname']],
-                    ['fontsize', ['fontsize']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['table', ['table']],
-                    ['insert', ['link', 'picture', 'video']]
-                ]
-            });
-        });
+        const summernoteOptions = {
+            toolbar: [
+                ['font', ['bold', 'italic', 'underline', 'clear']],
+                ['fontname', ['fontname']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']]
+            ]
+        };
+        $('textarea:not(.exclude)').summernote(summernoteOptions);
         var units = @Html.Raw(Json.Serialize(units));
 
         let products = @Html.Raw(Json.Serialize(products)); // Lấy danh sách sản phẩm từ Razor view
@@ -355,7 +353,7 @@
                 <td><input name="RecipeSteps[${rowCount}].FileStep" type="file" class="form-control" /></td>
                 <td><button type="button" class="btn btn-danger" onclick="removeStep(this)">Delete</button></td>`;
 
-            $(`textarea[name='RecipeSteps[${rowCount}].Directions']`).summernote();
+            $(`textarea[name='RecipeSteps[${rowCount}].Directions']`).summernote(summernoteOptions);
         }
         function removeIngredient(button) {
             var row = button.closest('tr');

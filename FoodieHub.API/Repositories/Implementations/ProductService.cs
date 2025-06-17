@@ -174,7 +174,7 @@ namespace FoodieHub.API.Repositories.Implementations
                 };
             }
 
-            obj.MainImage = uploadResult.FilePath.ToString();
+            obj.MainImage = uploadResult.FilePath;
             obj.Discount = productDto.Discount;
             obj.StockQuantity = productDto.StockQuantity;
             obj.IsActive = productDto.IsActive;
@@ -265,7 +265,7 @@ namespace FoodieHub.API.Repositories.Implementations
             obj.Description = product.Description;
             obj.ShelfLife = product.ShelfLife;
             obj.CategoryID = product.CategoryID;
-            var uploadResult = await _uploadImageHelper.UploadImage(product.MainImage, "Products");
+            var uploadResult = await _uploadImageHelper.UploadImage(product.MainImage, "Products",obj.MainImage);
 
             if (!uploadResult.Success)
             {

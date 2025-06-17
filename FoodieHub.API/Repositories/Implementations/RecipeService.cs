@@ -310,11 +310,10 @@ namespace FoodieHub.API.Repositories.Implementations
 
                 if (recipeDTO.File != null)
                 {
-                    var uploadResult = await _imageServices.UploadImage(recipeDTO.File, "Recipes");
+                    var uploadResult = await _imageServices.UploadImage(recipeDTO.File, "Recipes", entityToUpdate.ImageURL);
                     if (uploadResult.Success)
                     {
-                        _imageServices.DeleteImage(entityToUpdate.ImageURL);
-                        entityToUpdate.ImageURL = uploadResult.FilePath.ToString() ?? "";
+                        entityToUpdate.ImageURL = uploadResult.FilePath;
                     }
                 }
                 _context.Recipes.Update(entityToUpdate);
@@ -332,11 +331,10 @@ namespace FoodieHub.API.Repositories.Implementations
                         step.Directions = item.Directions;
                         if(item.FileStep != null)
                         {
-                            var uploadStep = await _imageServices.UploadImage(item.FileStep, "RecipeSteps");
+                            var uploadStep = await _imageServices.UploadImage(item.FileStep, "RecipeSteps", step?.ImageURL);
                             if (uploadStep.Success)
                             {
-                                if(item.ImageURL != null) _imageServices.DeleteImage(item.ImageURL);
-                                step.ImageURL =uploadStep.FilePath.ToString()??"";
+                                step.ImageURL = uploadStep.FilePath;
                             }
                         } 
                         _context.RecipeSteps.Update(step);
@@ -349,7 +347,7 @@ namespace FoodieHub.API.Repositories.Implementations
                             var uploadImage = await _imageServices.UploadImage(item.FileStep, "RecipeSteps");
                             if (uploadImage.Success)
                             {
-                                path = uploadImage.FilePath.ToString() ?? "";
+                                path = uploadImage.FilePath;
                             }
                         }
                         // them moi

@@ -190,22 +190,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
 
     <script>
-
-
-        $(document).ready(function () {
-            $('textarea:not(.exclude)').summernote({
-                toolbar: [
-                    ['font', ['bold', 'italic', 'underline', 'clear']],
-                    ['fontname', ['fontname']],
-                    ['fontsize', ['fontsize']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['table', ['table']],
-                    ['insert', ['link', 'picture', 'video']]
-                ]
-            });
-        });
-
+        const summernoteOptions = {
+            toolbar: [
+                ['font', ['bold', 'italic', 'underline', 'clear']],
+                ['fontname', ['fontname']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']]
+            ]
+        };
+        $('textarea:not(.exclude)').summernote(summernoteOptions);
 
         const units = @Html.Raw(Json.Serialize(units));
 
@@ -336,8 +332,8 @@
                 <td><textarea name="RecipeSteps[${rowCount}].Directions" class="form-control"></textarea></td>
                 <td><input name="RecipeSteps[${rowCount}].ImageStep" type="file" accept="images/*" class="form-control" /></td>
                 <td><button type="button" class="btn btn-danger" onclick="removeStep(this)">Delete</button></td>`;
-        
-            $(`textarea[name='RecipeSteps[${rowCount}].Directions']`).summernote();
+
+            $(`textarea[name='RecipeSteps[${rowCount}].Directions']`).summernote(summernoteOptions);
         
         }
 

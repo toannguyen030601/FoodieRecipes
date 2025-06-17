@@ -61,7 +61,7 @@ namespace FoodieHub.MVC.Controllers
                     Response.DeleteCookie("TokenAdmin");
                     Response.SetCookie("TokenUser", result.Data.ToString()??throw new Exception("An error"));
                     NotificationHelper.SetSuccessNotification(this,result.Message);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Recipes");
                }
             }
             return View(login);

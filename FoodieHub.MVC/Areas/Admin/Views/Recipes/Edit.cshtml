@@ -33,7 +33,7 @@
 
         <div class="form-group">
             <label asp-for="Description" class="font-weight-bold">Description</label>
-            <textarea asp-for="Description" class="form-control" placeholder="Enter the recipe description"></textarea>
+            <textarea asp-for="Description" class="form-control exclude" placeholder="Enter the recipe description"></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
         <div class="row">
@@ -206,7 +206,28 @@
             }
 </style>
 @section Scripts {
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+    <!-- Summernote CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+
+    <!-- Summernote JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
     <script>
+        const summernoteOptions = {
+            toolbar: [
+                ['font', ['bold', 'italic', 'underline', 'clear']],
+                ['fontname', ['fontname']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']]
+            ]
+        };
+        $('textarea:not(.exclude)').summernote(summernoteOptions);
+
         const units = @Html.Raw(Json.Serialize(units));
 
         let products = @Html.Raw(Json.Serialize(products)); // Lấy danh sách sản phẩm từ Razor view
@@ -336,6 +357,8 @@
                                 <td><textarea name="RecipeSteps[${rowCount}].Directions" class="form-control"></textarea></td>
                                 <td><input name="RecipeSteps[${rowCount}].ImageStep" type="file" accept="images/*" class="form-control" /></td>
                                 <td><button type="button" class="btn btn-danger" onclick="removeStep(this)">Delete</button></td>`;
+
+                                $(`textarea[name='RecipeSteps[${rowCount}].Directions']`).summernote(summernoteOptions);
         }
 
         function removeIngredient(button) {

@@ -4,6 +4,7 @@ using FoodieHub.MVC.Helpers;
 using FoodieHub.MVC.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using FoodieHub.MVC.Models.QueryModel;
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 namespace FoodieHub.MVC.Areas.Admin.Controllers
 {

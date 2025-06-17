@@ -650,7 +650,7 @@
                                 <button class="btn btn-outline-secondary "
                                         data-bs-dismiss="modal"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#addImgDetailModal">
+                                        data-bs-target="#addImgDetailModal-@item.ProductID">
                                     <i class="fa-solid fa-plus fa-2x"></i>
                                 </button>
                             </div>
@@ -701,31 +701,28 @@
 }
 
 @* Add Product Details Img *@
-@foreach(var item in Model)
+@foreach (var item in Model)
 {
-    <div class="modal fade" id="addImgDetailModal" tabindex="-1" aria-labelledby="addImgDetailModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addImgDetailModal-@item.ProductID" tabindex="-1" aria-labelledby="addImgDetailModalLabel-@item.ProductID" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addImgDetailtModalLabel">Add New Image Details</h5>
+                    <h5 class="modal-title" id="addImgDetailModalLabel-@item.ProductID">Add New Image Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
-                    <form asp-action="AddImg" asp-controller="ProductImage" method="post" enctype="multipart/form-data">
+                    <form asp-action="AddMultipleImages" asp-controller="ProductImage" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="ProductID" value="@item.ProductID" />
                         <div class="row">
-
-
                             <div class="form-group">
-                                <label for="MainImage">Main Image</label>
-                                <input type="file" class="form-control" accept=".jpg,.jpeg,.png" id="ImageURL" name="ImageURL" required />
-                                <span class="text-danger" id="MainImageError"></span>
+                                <label for="Images">Detail Images</label>
+                                <input type="file" class="form-control" accept=".jpg,.jpeg,.png" name="Images" multiple />
                             </div>
                         </div>
 
-                        <div class="form-group  mt-3 text-end">
+                        <div class="form-group mt-3 text-end">
                             <button type="submit" class="btn btn-secondary">Create</button>
-
                         </div>
                     </form>
                 </div>

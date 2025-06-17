@@ -37,9 +37,21 @@ namespace FoodieHub.API.Controllers
 
         // Thêm nhiều hình ảnh sản phẩm
         [HttpPost("addmultipleimages")]
-        public async Task<IActionResult> AddMultipleImages([FromForm] List<ProductImageDTO> imgs)
+        public async Task<IActionResult> AddMultipleImages([FromForm] int productID, [FromForm] List<IFormFile> Images)
         {
-            var response = await _service.AddMultipleImages(imgs);
+            if (Images == null || !Images.Any())
+            {
+                return BadRequest("No images uploaded.");
+            }
+
+            var imageDtos = Images.Select(file => new ProductImageDTO
+            {
+                ProductID = productID,
+                ImageURL = file
+            }).ToList();
+
+            var response = await _service.AddMultipleImages(imageDtos);
+
             return StatusCode(response.StatusCode, response);
         }
 

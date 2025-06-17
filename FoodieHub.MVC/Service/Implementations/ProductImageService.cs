@@ -54,17 +54,26 @@ namespace FoodieHub.MVC.Service.Implementations
             };
         }
 
-
-
-
-        public async Task<APIResponse> AddMultipleImages(List<ProductImageDTO> images)
+        public async Task<APIResponse> AddMultipleImages(int productID, List<IFormFile> images)
         {
-            var response = await _httpClient.PostAsJsonAsync($"ProductImages/addmultipleimages", images);
+            var content = new MultipartFormDataContent();
+
+            foreach (var image in images)
+            {
+                var fileContent = new StreamContent(image.OpenReadStream());
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue(image.ContentType);
+                content.Add(fileContent, "Images", image.FileName);
+            }
+
+            content.Add(new StringContent(productID.ToString()), "productID");
+
+            var response = await _httpClient.PostAsync("ProductImage/addmultipleimages", content);
 
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadFromJsonAsync<APIResponse>();
             }
+
             return new APIResponse
             {
                 Success = false,
