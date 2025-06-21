@@ -58,10 +58,12 @@ namespace FoodieHub.MVC.Controllers
                }
                else
                {
+                    Response.DeleteCookie("FullNameAdmin");
+                    Response.DeleteCookie("AvatarAdmin");
                     Response.DeleteCookie("TokenAdmin");
                     Response.SetCookie("TokenUser", result.Data.ToString()??throw new Exception("An error"));
                     NotificationHelper.SetSuccessNotification(this,result.Message);
-                    return RedirectToAction("Index", "Recipes");
+                    return RedirectToAction("Index", "Home");
                }
             }
             return View(login);

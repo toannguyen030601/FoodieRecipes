@@ -20,19 +20,19 @@ namespace FoodieHub.MVC.Controllers
         public async Task<IActionResult> Index()
         {
             var token = Request.GetCookie("TokenUser");
-            
+
             if (!string.IsNullOrEmpty(token))
             {
-                var user = await authService.GetProfile();            
-                if(user != null)
+                var user = await authService.GetProfile();
+                if (user != null)
                 {
-                    Response.SetCookie("UserID",user.Id);
+                    Response.SetCookie("UserID", user.Id);
                     Response.SetCookie("FullName", user.Fullname);
                     if (!string.IsNullOrEmpty(user?.Avatar))
                     {
                         Response.SetCookie("Avatar", user.Avatar);
                     }
-                }           
+                }
             }
             var query = new QueryRecipeModel
             {

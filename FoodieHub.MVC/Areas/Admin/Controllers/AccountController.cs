@@ -29,7 +29,7 @@ namespace FoodieHub.MVC.Areas.Admin.Controllers
             {
                 NotificationHelper.SetSuccessNotification(this,result.Message);              
                 Response.DeleteCookie("TokenUser");
-                Response.DeleteCookie("Name");
+                Response.DeleteCookie("FullName");
                 Response.DeleteCookie("Avatar");
 
                 Response.SetCookie("TokenAdmin", result.Data.ToString()??"");

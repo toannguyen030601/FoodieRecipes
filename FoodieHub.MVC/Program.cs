@@ -83,7 +83,7 @@ app.MapControllerRoute(
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Recipes}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.UseNotyf(); // Kích hoạt middleware của Notyf
 app.Run();
