@@ -175,7 +175,7 @@
                                         <div class="d-flex justify-content-between align-items-center">
                                             @if (recipe.Avatar != null)
                                             {
-                                                <img alt="@recipe.FullName" src="@($"{apiUrl}images/{recipe.Avatar}")" class="rounded-circle" style="height:40px;width:40px" />
+                                                <img alt="@recipe.FullName" src="@recipe.Avatar" class="rounded-circle" style="height:40px;width:40px" />
                                             }
                                             else
                                             {
