@@ -28,7 +28,7 @@
                 <tbody>
                     @foreach (var item in Model)
                     {
-                        <tr>
+                        <tr class="cart-item1" data-price="@item.Price" data-discount="@item.Discount">
                             <!-- Hình ảnh sản phẩm -->
                             <td class="align-middle">
                                 <img src="@item.MainImage" alt="Product Image" class="img-fluid rounded" style="width: 100px;" onerror="this.onerror=null; this.src='/images/user-logo-test.png';">
@@ -42,12 +42,12 @@
                                         @item.ProductName
                                     </h5>
                                     <!-- Số lượng -->
-                                    <form method="post" action="@Url.Action("UpdateCartItemLayout", "Cart")" class="update-cart-form1 d-flex align-items-center">
+                                    <form method="post" class="update-cart-form1 d-flex align-items-center">
                                         <input type="hidden" name="productId" value="@item.ProductID" />
                                         <div class="input-group" style="width: 120px;">
-                                            <button type="button" class="btn btn-outline-secondary decrease-quantity">-</button>
-                                            <input readonly type="number" name="quantity" class="form-control text-center quantity-input" value="@item.Quantity" min="1" data-max-stock="@item.StockQuantity">
-                                            <button type="button" class="btn btn-outline-secondary increase-quantity">+</button>
+                                            <button type="button" class="btn btn-outline-secondary decrease-quantity1">-</button>
+                                            <input readonly type="number" name="quantity" class="form-control text-center quantity-input1" value="@item.Quantity" min="1" data-max-stock="@item.StockQuantity">
+                                            <button type="button" class="btn btn-outline-secondary increase-quantity1">+</button>
                                         </div>
                                     </form>
                                 </div>
@@ -55,7 +55,7 @@
 
                             <!-- Giá sản phẩm -->
                             <td class="align-middle text-right">
-                                <span class="price">@($"${((item.Price - (item.Price * item.Discount / 100)) * item.Quantity).ToString("0.00")}")</span>
+                                <span class="item-total-price1">@($"${((item.Price - (item.Price * item.Discount / 100)) * item.Quantity).ToString("0.00")}")</span>
                             </td>
 
                             <!-- Nút xóa sản phẩm -->
@@ -77,7 +77,7 @@
         <hr>
         <div class="d-flex justify-content-between align-items-center mb-4">
             <span class="font-weight-bold">Subtotal:</span>
-            <span id="total-price" class="font-weight-bold">@($"${Model?.Sum(i => (i.Price - (i.Price * i.Discount / 100)) * i.Quantity).ToString("0.00")}")</span>
+            <span id="total-price1" class="font-weight-bold">@($"${Model?.Sum(i => (i.Price - (i.Price * i.Discount / 100)) * i.Quantity).ToString("0.00")}")</span>
         </div>
         <hr>
         <div class="d-flex justify-content-center w-100" style="height: 50px;">
@@ -85,4 +85,8 @@
         </div>
     </div>
 </div>
-
+@section Scripts {
+<script>
+        
+</script>
+}

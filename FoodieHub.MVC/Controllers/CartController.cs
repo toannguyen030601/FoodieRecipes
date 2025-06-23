@@ -137,7 +137,7 @@ namespace FoodieHub.MVC.Controllers
 
             var newCartItemsJson = System.Text.Json.JsonSerializer.Serialize(cartItems);
             Response.SetCookie("cart", newCartItemsJson);
-            NotificationHelper.SetSuccessNotification(this, "The product has been added to the cart successfully!");
+            _notyf.Success("The product has been added to the cart successfully!");
             var refererUrl = Request.Headers["Referer"].ToString();
             return Redirect(refererUrl ?? Url.Action("Index","Products"));
         }
@@ -176,7 +176,7 @@ namespace FoodieHub.MVC.Controllers
             var newCartItemsJson = System.Text.Json.JsonSerializer.Serialize(cartItems);
 
             Response.Cookies.Append("cart", newCartItemsJson);
-            NotificationHelper.SetSuccessNotification(this, "All products from the order have been added to the cart successfully!");
+            _notyf.Success("All products from the order have been added to the cart successfully!");
 
             return RedirectToAction("Checkout");
         }
@@ -253,7 +253,7 @@ namespace FoodieHub.MVC.Controllers
             var newCartItemsJson = System.Text.Json.JsonSerializer.Serialize(cartItems);
             Response.SetCookie("cart", newCartItemsJson);
 
-            return RedirectToAction("Checkout");
+            return Json(new { success = true });
         }
         [ValidateTokenForUser]
         [HttpPost]
@@ -277,8 +277,7 @@ namespace FoodieHub.MVC.Controllers
             Response.SetCookie("cart", newCartItemsJson);
 
             // Redirect back to the referring page
-            var refererUrl = Request.Headers["Referer"].ToString();
-            return Redirect(refererUrl ?? Url.Action("Checkout"));
+            return Json(new { success = true });
         }
         [ValidateTokenForUser]
         public IActionResult RemoveFromCart(int id)
@@ -299,7 +298,7 @@ namespace FoodieHub.MVC.Controllers
             var newCartItemsJson = System.Text.Json.JsonSerializer.Serialize(cartItems);
 
             Response.SetCookie("cart", newCartItemsJson);
-            NotificationHelper.SetSuccessNotification(this, "The product has been removed from the cart successfully!");
+            _notyf.Success("The product has been removed from the cart successfully!");
             return RedirectToAction("Checkout"); // Hoặc chuyển hướng đến trang giỏ hàng
         }
         [ValidateTokenForUser]
@@ -321,7 +320,7 @@ namespace FoodieHub.MVC.Controllers
             var newCartItemsJson = System.Text.Json.JsonSerializer.Serialize(cartItems);
 
             Response.SetCookie("cart", newCartItemsJson);
-            NotificationHelper.SetSuccessNotification(this, "The product has been removed from the cart successfully!");
+            _notyf.Success("The product has been removed from the cart successfully!");
             var refererUrl = Request.Headers["Referer"].ToString();
             return Redirect(refererUrl ?? Url.Action("Index"));
         }

@@ -24,37 +24,116 @@ navLinks.forEach(element => {
     });
 });
 
+//checkout
+function updateCheckoutTotals() {
+    let subtotal = 0;
 
-document.querySelectorAll('.decrease-quantity').forEach(button => {
+    document.querySelectorAll('.cart-item').forEach(row => {
+        const price = parseFloat(row.dataset.price);
+        const discount = parseFloat(row.dataset.discount);
+        const quantity = parseInt(row.querySelector('.quantity-input').value);
+
+        const finalPrice = price - (price * discount / 100);
+        const itemTotal = finalPrice * quantity;
+        subtotal += itemTotal;
+
+        // Cập nhật giá sau giảm
+        const priceEl = row.querySelector('.price');
+        if (priceEl) priceEl.textContent = `$${finalPrice.toFixed(2)}`;
+
+        // Cập nhật tổng giá từng dòng
+        const totalEl = row.querySelector('strong');
+        if (totalEl) totalEl.textContent = `$${itemTotal.toFixed(2)}`;
+    });
+
+    // Cập nhật tổng cộng
+    const subTotalEl = document.getElementById('subTotal');
+    const totalAmountEl = document.getElementById('TotalAmount');
+
+    if (subTotalEl) subTotalEl.textContent = subtotal.toFixed(2);
+    if (totalAmountEl) totalAmountEl.textContent = `$${subtotal.toFixed(2)}`;
+}
+
+document.querySelectorAll('.increase-quantity, .decrease-quantity').forEach(button => {
     button.addEventListener('click', function () {
-        const form = this.closest('.update-cart-form'); 
-        const inputField = form.querySelector('.quantity-input'); //
-        let quantity = parseInt(inputField.value) - 1;
-        quantity = Math.max(quantity, 1); 
-        inputField.value = quantity;
-        form.submit();
+        const form = this.closest('.update-cart-form');
+        const input = form.querySelector('.quantity-input');
+        const maxStock = parseInt(input.getAttribute('data-max-stock'));
+        let quantity = parseInt(input.value);
+
+        if (this.classList.contains('increase-quantity') && quantity < maxStock) {
+            quantity++;
+        } else if (this.classList.contains('decrease-quantity') && quantity > 1) {
+            quantity--;
+        }
+
+        input.value = quantity;
+        const productId = form.querySelector('input[name="productId"]').value;
+
+        fetch('/Cart/UpdateCartItem', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ productId, quantity })
+        }).then(() => {
+            updateCheckoutTotals();
+        });
     });
 });
 
-document.querySelectorAll('.increase-quantity').forEach(button => {
-    button.addEventListener('click', function () {
-        const form = this.closest('.update-cart-form'); 
-        const inputField = form.querySelector('.quantity-input'); 
-        const maxStock = parseInt(inputField.getAttribute('data-max-stock'));
-        let quantity = parseInt(inputField.value);
-        const contactModal = new bootstrap.Modal(document.getElementById('contactModalCheckOut'));
-        
-        if (quantity < maxStock) {
-            quantity++;
-            inputField.value = quantity;
-            form.submit();
-        } else {
-            alert(`The maximum available stock is ${maxStock}.`);
-            contactModal.show(); 
+
+//Components Cart
+function updateMiniCartTotals() {
+    let subtotal = 0;
+
+    document.querySelectorAll('tr.cart-item1').forEach(row => {
+        const price = parseFloat(row.dataset.price);
+        const discount = parseFloat(row.dataset.discount);
+        const quantity = parseInt(row.querySelector('.quantity-input1').value);
+
+        const finalPrice = price - (price * discount / 100);
+        const itemTotal = finalPrice * quantity;
+        subtotal += itemTotal;
+
+        // Cập nhật giá từng dòng
+        const itemTotalEl = row.querySelector('.item-total-price1');
+        if (itemTotalEl) {
+            itemTotalEl.textContent = `$${itemTotal.toFixed(2)}`;
         }
     });
-});
 
+    // Tổng tiền toàn giỏ
+    const subtotalEl = document.getElementById('total-price1');
+    if (subtotalEl) {
+        subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+    }
+}
+
+document.querySelectorAll('.increase-quantity1, .decrease-quantity1').forEach(button => {
+    button.addEventListener('click', function () {
+        const form = this.closest('.update-cart-form1');
+        const input = form.querySelector('.quantity-input1');
+        const maxStock = parseInt(input.getAttribute('data-max-stock'));
+        let quantity = parseInt(input.value);
+
+        if (this.classList.contains('increase-quantity1') && quantity < maxStock) {
+            quantity++;
+        } else if (this.classList.contains('decrease-quantity1') && quantity > 1) {
+            quantity--;
+        }
+
+        input.value = quantity;
+
+        const productId = form.querySelector('input[name="productId"]').value;
+
+        fetch('/Cart/UpdateCartItemLayout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ productId, quantity })
+        }).then(() => {
+            updateMiniCartTotals();
+        });
+    });
+});
 
 const couponID = document.getElementById("couponID");
 const couponInput = document.getElementById("couponInput");
