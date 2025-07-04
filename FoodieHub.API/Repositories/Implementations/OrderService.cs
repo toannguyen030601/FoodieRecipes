@@ -150,6 +150,7 @@ namespace FoodieHub.API.Repositories.Implementations
                     }
                     coupon.IsUsed = true;
                     newOrder.DiscountOfCoupon = discountOfCoupon;
+                    newOrder.TotalAmount -= discountOfCoupon;
                     _context.Coupons.Update(coupon);
                 }
                 if (order.PaymentMethod)

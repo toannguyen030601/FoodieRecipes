@@ -69,23 +69,25 @@
                     <hr>
                     <div class="d-flex justify-content-between">
                         <span class="fw-bold">AMOUNT</span>
-                        <span class="fw-bold">@Model.TotalAmount $</span>
+                        <span class="fw-bold">@(Model.TotalAmount + (Model.DiscountOfCoupon ?? 0)) $</span>
                     </div>
-                    <div class="d-flex justify-content-between">
-                        <span class="fw-bold">Discount</span>
-                        <span class="fw-bold">@Model.Discount $</span>
-                    </div>
+                    @if(Model.Discount != null){
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold">Discount</span>
+                            <span class="fw-bold">@Model.Discount $</span>
+                        </div>
+                    }
                     <div class="d-flex justify-content-between mt-2">
                         @if (Model.Coupon != null)
                         {
-                            <span>Coupon Code: <strong>@Model.Coupon.CouponCode</strong></span>                        
-                            <span>Discount: @Model.DiscountOfCoupon $</span>
+                            <span><strong>Coupon Code:</strong> @Model.Coupon.CouponCode</span>
+                            <span><strong>Discount:</strong> @Model.DiscountOfCoupon $</span>
                         }
                     </div>
 
                     <div class="d-flex justify-content-between">
                         <span class="fw-bold">TOTAL AMOUNT</span>
-                        <span class="fw-bold">@(Model.TotalAmount - (Model.Discount ?? 0) - (Model.DiscountOfCoupon ?? 0)) $</span>
+                        <span class="fw-bold">@Model.TotalAmount</span>
                     </div>
                     <hr>
                 </div>
@@ -97,9 +99,11 @@
 
                 <!-- Payment Address Section -->
                 <div class="col-md-3 mt-3">
-                    <h6 class="fw-bold mb-3">Payment Address</h6>
-                    <p class="mb-2">@Model.Fullname</p>
+                    <span class="fw-bold">Name:</span>
+                    <p class="mb-2"> @Model.Fullname</p>
+                    <span class="fw-bold">Phone:</span>
                     <p class="mb-2" style="font-style: italic;">@Model.PhoneNumber</p>
+                    <span class="fw-bold">Address:</span>
                     <p class="mb-2">@Model.ShippingAddress</p>
 
                     <!-- QR Code Section -->
