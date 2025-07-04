@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System.Security.Cryptography;
+using System.Text;
+using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using FoodieHub.API.Data;
 using FoodieHub.API.Data.Entities;
@@ -33,6 +35,15 @@ namespace FoodieHub.API.Repositories.Implementations
             _qrCodeService = qrCodeService;
             this.uploadImageHelper = uploadImageHelper;
             _userManager = userManager;
+        }
+
+        public string GenerateHash(int orderId, string secret)
+        {
+            using var sha = SHA256.Create();
+            var raw = $"{orderId}:{secret}";
+            var bytes = Encoding.UTF8.GetBytes(raw);
+            var hash = sha.ComputeHash(bytes);
+            return Convert.ToHexString(hash).ToLower(); // hoặc base64
         }
         public async Task<ServiceResponse> Create(OrderDTO order)
         {
@@ -146,14 +157,25 @@ namespace FoodieHub.API.Repositories.Implementations
                     newOrder.Discount = newOrder.TotalAmount * 10 / 100;
                 }
 
-                // Tạo QR Code
                 string linkOrderForQRCode = _config["OriginFE"] + $"/orders/qrcode/{newOrder.OrderID}";
 
                 byte[] qrcodeByte = _qrCodeService.GenerateQRCode(linkOrderForQRCode);
 
-                var pathQRCode = await uploadImageHelper.SaveImageFromBytesAsync(qrcodeByte, (newOrder.OrderID+".png"));
+                string fileName = $"{newOrder.OrderID}.png";
+                var uploadResult = await uploadImageHelper.UploadImageFromBytesAsync(qrcodeByte, fileName, "QRCodes");
 
-                newOrder.QRCode = pathQRCode;
+                if (!uploadResult.Success)
+                {
+                    await transaction.RollbackAsync();
+                    return new ServiceResponse
+                    {
+                        Success = false,
+                        Message = "Upload QR code to CDN failed: " + uploadResult.Message,
+                        StatusCode = 500
+                    };
+                }
+
+                newOrder.QRCode = uploadResult.FilePath;
 
                 _context.Orders.Update(newOrder);
 

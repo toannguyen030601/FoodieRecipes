@@ -89,15 +89,6 @@
     <input type="hidden" id="categoryFilter" name="categoryFilter" value="@ViewContext.HttpContext.Request.Query["categoryFilter"].FirstOrDefault()">
     <input type="hidden" id="sortBy" name="sortBy" value="@ViewContext.HttpContext.Request.Query["sortBy"].FirstOrDefault()">
 </form>
-
-
-
-
-
-
-
-
-
 <div class="container mb-3">
     <div class="col-md-12">
         <!-- Kiểm tra nếu Model rỗng hoặc không có sản phẩm phù hợp -->
@@ -117,76 +108,65 @@
                     // Kiểm tra nếu sản phẩm mới trong vòng 1 tháng
                     var oneMonthAgo = DateTime.Now.AddMonths(-1); // Lấy ngày cách đây 1 tháng
                     bool isNewProduct = item.CreatedAt >= oneMonthAgo;
+                    var discountedPriceMain = (item.Price - (item.Price * item.Discount / 100)).ToString("0.00");
+                    var listReviewOrther = await _reviewService.GetListReview(item.ProductID);
+                    int averageRatingOther = 0;
 
-                    <div class="col-md-3 col-lg-3 col-6">
-                        <div class="product-card p-3 shadow-sm position-relative">
+                    <div class="mt-3 col-6 col-sm-6 col-lg-3 col-md-4">
+                        <div class="product-card-item">
                             <a asp-action="Detail" asp-controller="Products" asp-route-id="@item.ProductID" class="d-block">
-                                <div class="product-image-container">
-                                    <img src="@item.MainImage" )"
-                                         alt="Product Image"
-                                         class="product-image img-fluid"
-                                         onerror="this.onerror=null; this.src='/images/user-logo-test.png';" />
+                                <div class="product-card-content">
+                                    <!-- Hiển thị chữ New nếu sản phẩm mới -->
+                                    @if (isNewProduct)
+                                    {
+                                        <span class="badge new-badge position-absolute top-0 start-0 m-2">New</span>
+                                    }
+                                    <img src="@item.MainImage" alt="Product Image" class="img-fluid" onerror="this.onerror=null; this.src='/images/user-logo-test.png';" />
+                                    <h6 class="mt-3 text-truncate" title="@item.ProductName">@item.ProductName</h6>
+                                    <div class="text-center">
+                                        @if (item.Discount == 0)
+                                        {
+                                            <span class="text-danger">$@item.Price.ToString("0.00")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-decoration-line-through text-muted">$@item.Price.ToString("0.00")</span>
+                                            <span class="h6 text-danger mx-2">$@discountedPriceMain</span>
+                                            <span class="badge bg-danger">-@item.Discount.ToString("0")%</span>
+                                        }
+                                        @if (listReviewOrther.Data != null && listReviewOrther.Data.Any())
+                                        {
+                                            double totalRate = listReviewOrther.Data.Sum(x => x.RatingValue); // Tổng tất cả rate
+                                            double avgRate = totalRate / listReviewOrther.Data.Count;  // Trung bình rate
+                                            averageRatingOther = avgRate >= 3.5 ? (int)Math.Ceiling(avgRate) : (int)Math.Floor(avgRate);
+                                        }
+                                    </div>
+                                    <p class="text-center text-warning">@averageRatingOther ★</p>
                                 </div>
                             </a>
-                            <div class="product-details">
-                                <!-- Hiển thị chữ New nếu sản phẩm mới -->
-                                @if (isNewProduct)
+                            <div class="product-card-footer">
+                                @if (item.StockQuantity <= 0)
                                 {
-                                    <span class="badge new-badge position-absolute top-0 start-0 m-2">New</span>
+                                    <button class="btn text-danger btn-sm" disabled>Out of stock</button>
                                 }
-                                <a asp-action="Detail" asp-controller="Products" asp-route-id="@item.ProductID" class="product-name">
-                                    <h6 class="mt-3 text-truncate" title="@item.ProductName">@item.ProductName</h6>
-                                </a>
-                                <p class="mb-1">
-                                    @{
-                                        var discountedPriceMain = (item.Price - (item.Price * item.Discount / 100)).ToString("0.00");
-                                    }
-                                    @if (item.Discount == 0)
-                                    {
-                                        <span class="text-danger">$@item.Price.ToString("0.00")</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-decoration-line-through text-muted">$@item.Price.ToString("0.00")</span>
-                                        <span class="h5 text-danger mx-2">$@discountedPriceMain</span>
-                                        <span class="discount-percent-text">-@item.Discount.ToString("0")%</span>
-                                    }
-                                </p>
+                                else
+                                {
+                                    <a href="@Url.Action("AddToCart", "Cart", new { productId = item.ProductID, quantity = 1 })" class="btn button-light btn-sm">Add to cart</a>
+                                }
                                 @{
-                                    var listReviewOrther = await _reviewService.GetListReview(item.ProductID);
-                                    int averageRatingOther = 0;
-                                    if (listReviewOrther.Data != null && listReviewOrther.Data.Any())
+                                    int totalSoldCount = 0;
+                                    if (listOrderDetail?.Data != null)
                                     {
-                                        double totalRate = listReviewOrther.Data.Sum(x => x.RatingValue); // Tổng tất cả rate
-                                        double avgRate = totalRate / listReviewOrther.Data.Count;  // Trung bình rate
-                                        averageRatingOther = avgRate >= 3.5 ? (int)Math.Ceiling(avgRate) : (int)Math.Floor(avgRate);
-                                    }
-                                }
-                                <p class="text-warning">@averageRatingOther ★</p>
-                                <div class="d-flex justify-content-between mt-3">
-                                    @if (item.StockQuantity <= 0)
-                                    {
-                                        <button class="btn text-danger btn-sm" disabled>Out of stock</button>
-                                    }
-                                    else
-                                    {
-                                        <a href="@Url.Action("AddToCart", "Cart", new { productId = item.ProductID, quantity = 1 })" class="btn button-light btn-sm">Add to cart</a>
-                                    }
-                                    @{
-                                        int totalSoldCount = 0;
-                                        if (listOrderDetail?.Data != null)
+                                        foreach (var itemDT in listOrderDetail.Data)
                                         {
-                                            foreach (var itemDT in listOrderDetail.Data)
+                                            if (itemDT.ProductID == item.ProductID && itemDT.Status == "COMPLETED")
                                             {
-                                                if (itemDT.ProductID == item.ProductID && itemDT.Status == "COMPLETED")
-                                                {
-                                                    totalSoldCount += itemDT.Quantity; // Cộng số lượng sản phẩm đã bán
-                                                }
+                                                totalSoldCount += itemDT.Quantity; // Cộng số lượng sản phẩm đã bán
                                             }
                                         }
                                     }
-                                    <span class="sold-text mt-2">Sold: @totalSoldCount Pcs</span>
-                                </div>
+                                }
+                                <span class="sold-text mt-2">Sold: @totalSoldCount Pcs</span>
                             </div>
                         </div>
                     </div>
@@ -271,40 +251,6 @@ a h6:hover {
         color: black;
         font-weight: 400;
     }
-
-
-    .product-card {
-        background-color: #fff;
-        border-radius: 15px;
-        border: 1px solid #eaeaea;
-        transition: all 0.3s ease;
-        text-align: center;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        margin: 10px;
-    }
-
-        .product-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transform: translateY(-5px);
-        }
-
-    .product-image-container {
-        width: 200px;
-        height: 200px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        margin: 0 auto;
-    }
-
-    .product-image {
-        max-width: 100%;
-        max-height: 100%;
-        border-radius: 15px;
-    }
     .pagination a {
         color: #444;
         padding: 8px 12px;
@@ -318,19 +264,6 @@ a h6:hover {
             background-color: #869FAE;
             color: #fff;
         }
-
-    .product-count, .sort-by {
-        font-size: 1rem;
-        color: #555;
-    }
-
-    .discount-percent-text {
-        background-color: red;
-        font-size: 12px;
-        color: white;
-        padding: 2px 3px;
-        border-radius: 6px;
-    }
     /* Kiểu dáng cho "New" badge */
     .new-badge {
         background-color: #28a745; /* Màu nền xanh */
@@ -347,17 +280,57 @@ a h6:hover {
         margin: 10px; /* Cách góc trên và bên phải 10px */
     }
 
-    .product-card {
-        position: relative; /* Để đặt "New" badge vào vị trí chính xác */
-        overflow: hidden; /* Đảm bảo "New" badge không bị tràn ra ngoài */
+    .product-card-item{
+        position: relative;
+        background-color: white;
+        width: 90%;
+        height: 100%;
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+        overflow: visible; /* Đảm bảo không bị cắt mất */
+        transform-origin: center; /* Phóng lớn từ trung tâm */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
     }
 
-        .product-card img {
-            width: 100%; /* Đảm bảo hình ảnh chiếm toàn bộ chiều rộng */
-            height: auto;
+        .product-card-item:hover {
+            transform: scale(1.05); /* Phóng lớn nhẹ */
+            z-index: 10; /* Đảm bảo nổi lên trên các phần tử khác */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
+    .product-card-content{
+        padding: 5px 5px 0 5px;
+        position: relative;
+    }
 
+        .product-card-content img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            height: 180px;
+            border-radius: 15px;
+        }
+
+        .product-card-content h6{
+            display: -webkit-box;
+            -webkit-line-clamp: 1; /* Số dòng tối đa */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: normal; /* Đảm bảo không bị hiển thị trên một dòng */
+            font-size: 1rem; /* Kích thước chữ có thể tùy chỉnh */
+            color: #333;
+            text-align:center
+        }
+
+    .product-card-footer{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 25px 10px 25px;
+        font-size: 0.8rem;
+    }
 </style>
 <script>
     function setFilter(filterName, value) {

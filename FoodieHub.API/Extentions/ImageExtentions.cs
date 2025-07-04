@@ -59,24 +59,33 @@ namespace FoodieHub.API.Extentions
                 Message = uploadResult.Error?.Message
             };
         }
-        public async Task<string> SaveImageFromBytesAsync(byte[] imageBytes, string fileName)
+        public async Task<UploadImageResult> UploadImageFromBytesAsync(byte[] imageBytes, string fileName, string folder)
         {
-            // Define the path to save the image in the wwwroot/images folder
-            string wwwRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images","QRCodes");
+            using var stream = new MemoryStream(imageBytes);
 
-            // Ensure the directory exists, if not, create it
-            if (!Directory.Exists(wwwRootPath))
+            var uploadParams = new ImageUploadParams
             {
-                Directory.CreateDirectory(wwwRootPath);
+                File = new FileDescription(fileName, stream),
+                Folder = folder
+            };
+
+            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+            if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return new UploadImageResult
+                {
+                    Success = true,
+                    Message = "Upload file success",
+                    FilePath = uploadResult.SecureUrl.ToString()
+                };
             }
 
-            // Create the full path for the image
-            string filePath = Path.Combine(wwwRootPath, fileName);
-
-            // Write the byte array as an image file
-            await File.WriteAllBytesAsync(filePath, imageBytes);
-            string relativePath = Path.Combine("images","QRCodes", fileName);
-            return relativePath;
+            return new UploadImageResult
+            {
+                Success = false,
+                Message = uploadResult.Error?.Message
+            };
         }
 
 
