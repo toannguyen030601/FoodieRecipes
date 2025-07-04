@@ -36,8 +36,6 @@ namespace FoodieHub.MVC.Controllers
             }
             var query = new QueryRecipeModel
             {
-                SortBy = "TotalFavorites",
-                PageSize = 3,
                 IsActive = true,
             };
             var result = await recipeService.GetAll(query);

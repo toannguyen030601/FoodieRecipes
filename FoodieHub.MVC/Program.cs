@@ -55,7 +55,7 @@ builder.Services.AddTransient<CustomHttpClientHandler>();
 // Thêm ToastNotification
 builder.Services.AddNotyf(config =>
 {
-    config.DurationInSeconds = 5;  // Thời gian hiển thị thông báo
+    config.DurationInSeconds = 4;  // Thời gian hiển thị thông báo
     config.IsDismissable = true;   // Cho phép đóng thông báo
     config.Position = NotyfPosition.TopRight;  // Vị trí hiển thị
     config.HasRippleEffect = true;  // Hiệu ứng khi click vào thông báo

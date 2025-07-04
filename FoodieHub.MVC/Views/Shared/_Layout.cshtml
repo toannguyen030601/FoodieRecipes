@@ -38,14 +38,14 @@
         <div class="container">
             <div class="row align-items-center justify-content-between w-100">
                 <!-- Logo -->
-                <div class="col-auto">
+                <div class="col-auto" style="padding: 0;">
                     <a class="logo" href="/">
                         <img src="~/images/logo.png" alt="Alternate Text" class="img-fluid" width="80px" height="80px" />    
                     </a>
                 </div>
 
                 <!-- Nav Menu (Large Screen Only) -->
-                <nav class="nav__menu col-auto d-none d-lg-block ">
+                <nav class="nav__menu col-auto d-none d-lg-block " >
                     <ul class="d-flex m-0 p-0">
                         <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Home" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
                             <a class="nav__link" href="/Home">Home</a>
@@ -64,7 +64,7 @@
                 </nav>
 
                 <!-- Search Input (Large Screen Only) -->
-                <div class="col-3 d-none d-lg-block">
+                <div class="col-3 d-none d-lg-block" >
                     <form asp-action="Index" asp-controller="Products" method="get">
                         <input class="form-control p-2 rounded-3 text-secondary"
                                type="text"
@@ -75,7 +75,7 @@
                 </div>
 
                 <!-- User and Cart Icons -->
-                <div class="col-auto">
+                <div class="col-auto" style="padding: 0;">
                     <div class="d-flex column-gap-2 column-gap-sm-3 justify-content-end">
                         <a href="/account/dashboard" class="d-inline-flex column-gap-2 align-items-center btn-profile">
                             <div id="avatar"></div>                      
@@ -86,7 +86,7 @@
                 </div>
 
                 <!-- Toggle Menu and Search for Mobile -->
-                <div class="col-auto d-lg-none">
+                <div class="col-auto d-lg-none" style="padding: 0;">
                     <button class="toggleSearch" id="toggleSearch">
                         <i class="fa-solid fa-search"></i>
                     </button>

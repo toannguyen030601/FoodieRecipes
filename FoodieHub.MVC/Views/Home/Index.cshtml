@@ -4,43 +4,478 @@
 @inject IOrderService _orderService;
 @inject IReviewService _reviewService;
 @inject IConfiguration Configuration
+@inject IFavoriteService favoriteService;
+@inject IRecipeCategoryService recipeCategory;
 @{
     ViewData["Title"] = "Home Page";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     var apiUrl = Configuration["BaseHost"];
 
-    var listOrderDetails = await _orderService.GetOrderDetailsWithProductID();
+    var listFavorites = await favoriteService.GetFR() ?? new List<GetRecipeDTO>();
 
-    var listProduct = await _productService.GetAll();
+    var mostFavoriteRecipe = Model
+    .Where(x => x.IsActive)
+    .OrderByDescending(x => x.TotalFavorites)
+    .FirstOrDefault();
 
-    var latestProducts = listProduct
-    .Where(item => item.IsActive == true && item.StockQuantity > 0) 
-    .OrderByDescending(item => item.CreatedAt) 
-    .Take(4) 
-    .ToList(); 
+    var ourLatestRecipes = Model
+        .Where(x => x.RecipeID != mostFavoriteRecipe?.RecipeID)
+        .Take(4)
+        .ToList();
 
-
-
-    var productSales = listOrderDetails?.Data
-      ?.Where(od => od.Status == "COMPLETED") // Chỉ lấy hóa đơn đã hoàn thành
-      .GroupBy(od => od.ProductID)            // Nhóm theo ProductID
-      .Select(group => new
-      {
-          ProductID = group.Key,              // ID của sản phẩm
-          TotalSold = group.Sum(od => od.Quantity) // Tổng số lượng đã bán
-      })
-      .OrderByDescending(ps => ps.TotalSold)  // Sắp xếp giảm dần theo số lượng bán
-      .FirstOrDefault();                      // Lấy sản phẩm bán chạy nhất
-
-
+    var listCategoriesRecipes = await recipeCategory.GetAll();
 }
 
 @model IEnumerable<GetRecipeDTO>
-
 <div class="container">
+    @* mostFavoriteRecipe *@
+    <div class="row mostFavoriteRecipe">
+        @if (mostFavoriteRecipe != null)
+        {
+            <div class="col-md-6 d-flex justify-content-center align-items-center">
+                <a href="@Url.Action("Detail", "Recipes", new { id = mostFavoriteRecipe.RecipeID })">
+                    <img src="@mostFavoriteRecipe.ImageURL" alt="@mostFavoriteRecipe.Title" class="img-fluid rounded" style="width: 100%; max-height:600px" />
+                </a>
+            </div>
+            <div class="col-md-6 d-flex justify-content-center align-items-center  px-15 py-30">
+                <div class="info-mostFavoriteRecipe text-center">
+                    <span class="text-uppercase text-muted small">Recipe of the Day</span>
+                    <a href="@Url.Action("Detail", "Recipes", new { id = mostFavoriteRecipe.RecipeID })">
+                        <h2 id="font-aime" class="title-mostFavoriteRecipe fw-bold">@mostFavoriteRecipe.Title</h2>
+                    </a>
+                    <div class="author d-flex align-items-center justify-content-center mt-2">
+                        <img alt="avatar" src="@mostFavoriteRecipe.Avatar" />
+                        <span class="ms-2">@mostFavoriteRecipe.FullName</span>
+                    </div>
+                    <div class="favorite mt-2">
+                        <a href="javascript:void(0);"
+                           class="text-decoration-none favoriteBtn"
+                           data-recipe-id="@mostFavoriteRecipe.RecipeID"
+                           data-favorited="@listFavorites.Select(x => x.RecipeID).Contains(mostFavoriteRecipe.RecipeID).ToString().ToLower()">
 
+                            <i id="favoriteIcon" class="@(listFavorites.Select(x => x.RecipeID).Contains(mostFavoriteRecipe.RecipeID) ? "fas" : "far") fa-heart"></i>
+                            <span id="favoriteCount" class="ms-1">@mostFavoriteRecipe.TotalFavorites</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="d-flex justify-content-center">
+        <div class="mt-3" style="width: 1000px;">
+            @* các recipe mới *@
+            <div class="mt-2">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3 id="font-aime" style="font-size: 25px;">Our latest recipes</h3>
+                    </div>
+                    <div class="containerbtn">
+                        <a class="btn" asp-action="Index" asp-controller="Recipes">See More</a>
+                    </div>
+                </div>
+                <div class="row">
+                    @if (Model.Any())
+                    {
+                        @foreach (var recipe in ourLatestRecipes)
+                        {
+                            <div class="mt-3 col-6 col-sm-6 col-lg-3 col-md-4" style="padding:5px;">
+                                <div class="card-more-delicious-item">
+                                    <div class="card-more-delicious-item-content">
+                                        <a href="@Url.Action("Detail", "Recipes", new { id = recipe.RecipeID })">
+                                            <img class="img-fluid" alt="@recipe.Title" src="@recipe.ImageURL" />
+                                            <div class="badges">
+                                                <span class="badge time">
+                                                    <i class="far fa-clock"></i> @recipe.CookTime.ToString("HH:mm") min
+                                                </span>
+                                                <span class="badge catename">
+                                                    @recipe.CategoryName
+                                                </span>
+                                            </div>
+                                        </a>
+                                        <div class="favorite">
+                                            <a href="javascript:void(0);"
+                                               class="text-decoration-none favoriteBtn"
+                                               data-recipe-id="@recipe.RecipeID"
+                                               data-favorited="@listFavorites.Select(x => x.RecipeID).Contains(recipe.RecipeID).ToString().ToLower()">
+
+                                                <i id="favoriteIcon" class="@(listFavorites.Select(x => x.RecipeID).Contains(recipe.RecipeID) ? "fas" : "far") fa-heart"></i>
+                                                <span id="favoriteCount" class="ms-1">@recipe.TotalFavorites</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <h3>@recipe.Title</h3>
+                                    <div class="card-more-delicious-item-footer">
+                                        <div class="author">
+                                            <img alt="avatar" src="@recipe.Avatar" class="rounded-circle" style="object-fit: cover;" />
+                                            <span>@recipe.FullName</span>
+                                        </div>
+                                        <div class="rating">
+                                            <span>@recipe.RatingAverage</span>
+                                            <i class="fas fa-star ms-1"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>No recipes found.</p>
+                    }
+                </div>
+            </div>
+            @* cate *@
+            <div class="mt-3">
+                <h3 class="text-center" id="font-aime" style="font-size: 25px;">What am I cooking today</h3>
+                <div class="row">
+                    @if (listCategoriesRecipes != null)
+                    {
+                        foreach (var category in listCategoriesRecipes)
+                        {
+                            <div class="col-6 col-sm-4 col-md-4 col-lg-4 text-center mb-3">
+                                <a href="@Url.Action("Index", "Recipes", new { categoryId = category.CategoryID })" class="text-decoration-none">
+                                    <div class="p-2 border rounded shadow-sm bg-light">
+                                        <img src="@category.ImageURL" alt="@category.CategoryName" class="img-fluid mb-2" style="height: 60px;" />
+                                        <div class="fw-bold text-dark">@category.CategoryName</div>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    }else{
+                        <p>No recipes Category found.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<style>
+    #font-aime {
+        font-family: '__aime_138127', '__aime_Fallback_138127';
+        font-size: 40px;
+        font-weight: bold;
+    }
+
+    .mostFavoriteRecipe:hover a{
+        text-decoration: underline;
+        text-decoration-color: #fc642d;
+    }
+    .info-mostFavoriteRecipe {
+        text-align: center;
+    }
+
+        .info-mostFavoriteRecipe a {
+            color: rgb(0,0,0);
+        }
+
+        .info-mostFavoriteRecipe .author img {
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            margin-right: 5px;
+        }
+
+    .info-mostFavoriteRecipe .favorite {
+        bottom: 10px;
+        right: 10px;
+        background-color: #fff;
+        color: #333;
+        font-size: 1rem;
+        border-radius: 15px;
+        padding: 5px 8px;
+        gap: 5px;
+    }
+
+            .info-mostFavoriteRecipe .favorite i {
+                color: #ff6b6b;
+            }
+
+    .rating i {
+        color: gold;
+        font-size: 0.8rem;
+        margin-right: 2px;
+    }
+
+    .card-more-delicious-item {
+        position: relative;
+        background-color: white;
+        width: 100%;
+        height: 100%;
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+        overflow: visible; /* Đảm bảo không bị cắt mất */
+        transform-origin: center; /* Phóng lớn từ trung tâm */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+
+        .card-more-delicious-item:hover {
+            transform: scale(1.05); /* Phóng lớn nhẹ */
+            z-index: 10; /* Đảm bảo nổi lên trên các phần tử khác */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+    .card-more-delicious-item-content {
+        padding: 5px;
+        position: relative;
+    }
+
+        .card-more-delicious-item-content img {
+            display: block;
+            width:100%;
+            height: 200px;
+            border-radius: 15px;
+        }
+
+    .card-more-delicious-item h3 {
+        margin: 10px 10px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Số dòng tối đa */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal; /* Đảm bảo không bị hiển thị trên một dòng */
+        font-size: 0.8rem; /* Kích thước chữ có thể tùy chỉnh */
+        color: #333;
+    }
+
+    .card-more-delicious-item-content .badges {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+
+    .card-more-delicious-item-content .badges .badge {
+        display: inline-block; /* Đảm bảo là inline block */
+        max-width: 100%; /* Đặt giới hạn chiều rộng tối đa */
+        white-space: normal; /* Cho phép xuống dòng */
+        word-wrap: break-word; /* Chia chữ khi quá dài */
+        text-align: center; /* Canh giữa chữ */
+        font-size: 0.6rem; /* Đặt kích thước chữ phù hợp */
+        border-radius: 5px; /* Bo góc cho badge */
+    }
+
+        .card-more-delicious-item-content .badges .catename {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+            .card-more-delicious-item-content .badges .time {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+    .card-more-delicious-item-content .favorite {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background-color: #fff;
+        color: #333;
+        font-size: 0.8rem;
+        border-radius: 15px;
+        padding: 5px 8px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .card-more-delicious-item-content a {
+        color: rgb(0,0,0);
+    }
+
+    .card-more-delicious-item-content .favorite i {
+        color: #ff6b6b;
+    }
+
+    .card-more-delicious-item-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px;
+        font-size: 0.8rem;
+    }
+
+        .card-more-delicious-item-footer .author {
+            display: flex;
+            align-items: center;
+        }
+
+            .card-more-delicious-item-footer .author img {
+                border-radius: 50%;
+                width: 25px;
+                height: 25px;
+                margin-right: 10px;
+            }
+
+        .card-more-delicious-item-footer .rating {
+            display: flex;
+            align-items: center;
+        }
+
+            .card-more-delicious-item-footer .rating i {
+                margin-right: 5px;
+            }
+
+    /* From Uiverse.io by 3bdel3ziz-T */
+    /*Global btn styles*/
+    .btn {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        outline: none;
+        vertical-align: middle;
+        text-decoration: none;
+        background: transparent;
+        font-size: 12px;
+        border: none;
+    }
+    /*Container styles*/
+    .containerbtn {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+    }
+    /*Main button styles*/
+    .btn {
+        position: relative;
+        height: fit-content;
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        width: 110px;
+        height: 8px;
+        text-align: center;
+        text-indent: 30px;
+        transition: 300ms;
+        font-weight: 500;
+    }
+
+        .btn::before {
+            content: "";
+            transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+            position: absolute;
+            left: 0;
+            display: block;
+            width: 30px;
+            height: 30px;
+            border-radius: 15px;
+            background-color: #282936;
+            z-index: -1;
+        }
+
+        .btn::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 13px;
+            transform: translate(-50%, -50%) rotate(45deg);
+            width: 9px;
+            height: 9px;
+            border-top: 2px solid #fff;
+            border-right: 2px solid #fff;
+            transition: 400ms;
+        }
+
+        .btn:hover {
+            text-indent: 10px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn:active {
+            scale: 0.95;
+        }
+
+        .btn:hover::before {
+            width: 100%;
+        }
+
+        .btn:hover::after {
+            left: calc(100% - 18px);
+        }
+
+</style>
+@section Scripts {
+    <script>
+                document.addEventListener("DOMContentLoaded", function () {
+            const favoriteBtns = document.querySelectorAll(".favoriteBtn");
+
+            favoriteBtns.forEach(favoriteBtn => {
+                favoriteBtn.addEventListener("click", async function (event) {
+                    event.preventDefault();
+                    event.stopPropagation(); // Ngăn sự kiện click lan lên thẻ <a> cha nếu có
+
+                    const btn = this;
+                    const recipeId = btn.dataset.recipeId;
+                    const isFavorited = btn.dataset.favorited === "true";
+
+                    const url = isFavorited
+                        ? '@Url.Action("UnFavorite", "Recipes")'
+                        : '@Url.Action("Favorite", "Recipes")';
+
+                    try {
+                        const response = await fetch(`${url}?id=${recipeId}`, {
+                            method: "POST",
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            const icon = btn.querySelector("i");
+                            const countSpan = btn.querySelector("span");
+                            let count = parseInt(countSpan.innerText);
+
+                            if (isFavorited) {
+                                icon.classList.remove("fas");
+                                icon.classList.add("far");
+                                btn.dataset.favorited = "false";
+                                countSpan.innerText = count - 1;
+                            } else {
+                                icon.classList.remove("far");
+                                icon.classList.add("fas");
+                                btn.dataset.favorited = "true";
+                                countSpan.innerText = count + 1;
+                            }
+
+                            showNotification(result.message, result.notificationType);
+                        } else {
+                            showNotification(result.message, result.notificationType);
+                        }
+                    } catch (err) {
+                        console.error("You need to log in to continue.", err);
+                        showNotification("You need to log in to continue.", "error");
+                    }
+                });
+            });
+        });
 
 
+        // Thông báo Notyf
+        const notyf = new Notyf({
+            duration: 4000,
+            dismissible: true,
+            ripple: true,
+            position: { x: 'right', y: 'top' },
+            dismissOthers: true
+        });
+
+        function showNotification(message, type) {
+            if (type === 'success') {
+                notyf.success(message);
+            } else {
+                notyf.error(message);
+            }
+        }
+    </script>
+}

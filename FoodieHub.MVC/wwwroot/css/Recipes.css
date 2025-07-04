@@ -2,6 +2,9 @@
     background-color: #f8f9fa;
 }
 
+
+
+/*recipe-css*/
 .rating i {
     color: gold;
     font-size: 0.8rem;
@@ -71,12 +74,12 @@
     border-radius: 5px; /* Bo góc cho badge */
 }
 
-    .badge.catename {
+    .catename {
         background-color: #d4edda;
         color: #155724;
     }
 
-    .badge.time {
+    .time {
         background-color: #f8d7da;
         color: #721c24;
     }
