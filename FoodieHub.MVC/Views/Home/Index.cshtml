@@ -23,7 +23,7 @@
 
     var ourLatestRecipes = Model
         .Where(x => x.RecipeID != mostFavoriteRecipe?.RecipeID)
-        .Take(4)
+        .Take(8)
         .ToList();
 
     var listCategoriesRecipes = await recipeCategory.GetAll();
