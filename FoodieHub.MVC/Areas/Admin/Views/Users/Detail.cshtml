@@ -34,7 +34,14 @@
     <div class="mt-4">
         <!-- Set Role Button -->
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#setRoleModal">
-            Set Role Admin
+            @if (Model.Role == "Admin")
+            {
+                <text>Set Role User</text>
+            }
+            else
+            {
+                <text>Set Role Admin</text>
+            }
         </button>
 
         <a asp-action="Index" class="btn btn-secondary">Back to List</a>
@@ -55,8 +62,16 @@
 
                     <div>
                         <b>New Role: </b>                                             
-                        <span class="text-danger">Admin</span>
-                        <input type="hidden" name="Role" value="Admin" />
+                        @if (Model.Role == "Admin")
+                        {
+                            <span class="text-danger">User</span>
+                            <input type="hidden" name="Role" value="User" />
+                        }
+                        else
+                        {
+                            <span class="text-danger">Admin</span>
+                            <input type="hidden" name="Role" value="Admin" />
+                        }
                     </div>
 
                     <p>Are you sure you want to set this role?</p>
