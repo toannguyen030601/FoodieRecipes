@@ -32,6 +32,10 @@
         PageSize = 20
     };
     var getUsers = await userService.Get(queryUser);
+
+	var getUsersActive = getUsers?.Items
+		.Where(x => x.IsActive)
+		.ToList();
 }
 <!-- Swiper CSS -->
 <link rel="stylesheet"
@@ -166,9 +170,9 @@
                 <div class="swiper">
                     <div class="card-swiper">
                         <ul class="swiper-wrapper" style="padding-left: 0px;">
-                            @if (getUsers != null)
+                            @if (getUsersActive != null)
                             {
-                                foreach (var user in getUsers.Items)
+                                foreach (var user in getUsersActive)
                                 {
                                     <li class="text-center border-0 shadow-sm p-2 swiper-slide">
                                         <a href=@("/account/userinfo/"+user.Id)>
