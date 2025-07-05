@@ -1,11 +1,13 @@
 ﻿@using FoodieHub.MVC.Models.Recipe
 @using FoodieHub.MVC.Service.Interfaces
+@using FoodieHub.MVC.Models.QueryModel
 @inject IProductService _productService;
 @inject IOrderService _orderService;
 @inject IReviewService _reviewService;
 @inject IConfiguration Configuration
 @inject IFavoriteService favoriteService;
 @inject IRecipeCategoryService recipeCategory;
+@inject IUserService userService;
 @{
     ViewData["Title"] = "Home Page";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -25,8 +27,16 @@
         .ToList();
 
     var listCategoriesRecipes = await recipeCategory.GetAll();
-}
 
+    var queryUser = new QueryUserModel();
+    var getUsers = await userService.Get(queryUser);
+}
+<!-- Swiper CSS -->
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 @model IEnumerable<GetRecipeDTO>
 <div class="container">
     @* mostFavoriteRecipe *@
@@ -62,16 +72,16 @@
             </div>
         }
     </div>
-    <div class="d-flex justify-content-center">
-        <div class="mt-3" style="width: 1000px;">
+    <div class="home-content">
+        <div class="mt-3">
             @* các recipe mới *@
             <div class="mt-2">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h3 id="font-aime" style="font-size: 25px;">Our latest recipes</h3>
+                        <h3 id="font-aime" style="font-size: 25px;">Our Latest Recipes</h3>
                     </div>
                     <div class="containerbtn">
-                        <a class="btn" asp-action="Index" asp-controller="Recipes">See More</a>
+                        <a class="btnSeeMore" asp-action="Index" asp-controller="Recipes">See More</a>
                     </div>
                 </div>
                 <div class="row">
@@ -127,24 +137,53 @@
             </div>
             @* cate *@
             <div class="mt-3">
-                <h3 class="text-center" id="font-aime" style="font-size: 25px;">What am I cooking today</h3>
+                <h3 id="font-aime" style="font-size: 25px;">What to cook today</h3>
                 <div class="row">
                     @if (listCategoriesRecipes != null)
                     {
                         foreach (var category in listCategoriesRecipes)
                         {
-                            <div class="col-6 col-sm-4 col-md-4 col-lg-4 text-center mb-3">
+                            <div class="col-6 col-sm-4 col-md-4 col-lg-4 text-center mb-3 categoriesRecipes">
                                 <a href="@Url.Action("Index", "Recipes", new { categoryId = category.CategoryID })" class="text-decoration-none">
-                                    <div class="p-2 border rounded shadow-sm bg-light">
+                                    <div class="p-2 bg-light info-cate">
                                         <img src="@category.ImageURL" alt="@category.CategoryName" class="img-fluid mb-2" style="height: 60px;" />
                                         <div class="fw-bold text-dark">@category.CategoryName</div>
                                     </div>
                                 </a>
                             </div>
                         }
-                    }else{
+                    }
+                    else
+                    {
                         <p>No recipes Category found.</p>
                     }
+                </div>
+            </div>
+            @* Explore the best recipes from *@
+            <div class="mt-3">
+                <h3 id="font-aime" style="font-size: 25px;">Explore the best recipes from</h3>
+                <div class="swiper">
+                    <div class="card-swiper">
+                        <ul class="swiper-wrapper" style="padding-left: 0px;">
+                            @if (getUsers != null)
+                            {
+                                foreach (var user in getUsers.Items)
+                                {
+                                    <li class="text-center border-0 shadow-sm p-2 swiper-slide">
+                                        <img src="@(!string.IsNullOrEmpty(user.Avatar) ? user.Avatar : "/images/profile.jpg")"
+                                             alt="@user.Fullname"
+                                             class="rounded-circle mx-auto d-block"
+                                             style="width: 70px; height: 70px; object-fit: cover;" />
+                                        <div class="mt-2 fw-semibold text-dark">@user.Fullname</div>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                        <div class="swiper-pagination"></div>
+                        <!-- If we need navigation buttons -->
+                        <div class="swiper-button-prev"></div>
+                        <div class="swiper-button-next"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -152,6 +191,10 @@
 </div>
 
 <style>
+    .home-content{
+        max-width: 1000px;
+        margin: 0 auto;
+    }
     #font-aime {
         font-family: '__aime_138127', '__aime_Fallback_138127';
         font-size: 40px;
@@ -324,7 +367,7 @@
 
     /* From Uiverse.io by 3bdel3ziz-T */
     /*Global btn styles*/
-    .btn {
+    .btnSeeMore {
         position: relative;
         display: inline-block;
         cursor: pointer;
@@ -334,6 +377,7 @@
         background: transparent;
         font-size: 12px;
         border: none;
+        color: black;
     }
     /*Container styles*/
     .containerbtn {
@@ -344,7 +388,7 @@
         gap: 15px;
     }
     /*Main button styles*/
-    .btn {
+    .btnSeeMore {
         position: relative;
         height: fit-content;
         display: flex;
@@ -353,12 +397,12 @@
         width: 110px;
         height: 8px;
         text-align: center;
-        text-indent: 30px;
+        text-indent: 35px;
         transition: 300ms;
         font-weight: 500;
     }
 
-        .btn::before {
+        .btnSeeMore::before {
             content: "";
             transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
             position: absolute;
@@ -371,7 +415,7 @@
             z-index: -1;
         }
 
-        .btn::after {
+        .btnSeeMore::after {
             content: "";
             position: absolute;
             top: 50%;
@@ -384,24 +428,67 @@
             transition: 400ms;
         }
 
-        .btn:hover {
+        .btnSeeMore:hover {
             text-indent: 10px;
             color: white;
             font-weight: 600;
         }
 
-        .btn:active {
+        .btnSeeMore:active {
             scale: 0.95;
         }
 
-        .btn:hover::before {
+        .btnSeeMore:hover::before {
             width: 100%;
         }
 
-        .btn:hover::after {
+        .btnSeeMore:hover::after {
             left: calc(100% - 18px);
         }
 
+    .categoriesRecipes .info-cate {
+        padding: 0 15px;
+        background-color: white;
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+        overflow: visible; /* Đảm bảo không bị cắt mất */
+        transform-origin: center; /* Phóng lớn từ trung tâm */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        transition: all 0.3s ease;
+    }
+
+        .categoriesRecipes .info-cate:hover {
+            transform: scale(1.05); /* Phóng lớn nhẹ */
+            z-index: 10; /* Đảm bảo nổi lên trên các phần tử khác */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+    .swiper {
+        padding-bottom: 20px; /* chừa chỗ cho pagination */
+    }
+
+    /* Thu nhỏ nút và đặt lại vị trí */
+    .swiper-button-prev,
+    .swiper-button-next {
+        width: 30px;
+        height: 30px;
+        background-color: transparent;
+        color: black; /* Mặc định màu đen */
+        border-radius: 50%;
+        font-size: 18px;
+    }
+
+        /* Làm icon nhỏ hơn */
+        .swiper-button-prev::after,
+        .swiper-button-next::after {
+            font-size: 18px;
+        }
+
+    /* Chế độ nền tối (nếu dùng dark mode qua class hoặc toggle JS) */
+    body.dark-mode .swiper-button-prev,
+    body.dark-mode .swiper-button-next {
+        color: white;
+    }
 </style>
 @section Scripts {
     <script>
@@ -477,5 +564,29 @@
                 notyf.error(message);
             }
         }
+        const swiper = new Swiper('.card-swiper', {
+          // Optional parameters
+
+          // If we need pagination
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+            dynamicBullets: true,
+          },
+
+          // Navigation arrows
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+
+          breakpoints: {
+          320: { slidesPerView: 3 },
+          576: { slidesPerView: 4 },
+          768: { slidesPerView: 5 },
+          992: { slidesPerView: 6 },
+          1200: { slidesPerView: 7 }
+        }
+        });
     </script>
 }

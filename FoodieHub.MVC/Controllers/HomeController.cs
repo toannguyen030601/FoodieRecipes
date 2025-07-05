@@ -11,10 +11,13 @@ namespace FoodieHub.MVC.Controllers
     {
         private readonly IAuthService authService;
         private readonly IRecipeService recipeService;
-        public HomeController(IAuthService authService, IRecipeService recipeService)
+        private readonly IUserService userService;
+
+        public HomeController(IAuthService authService, IRecipeService recipeService, IUserService userService)
         {
             this.authService = authService;
             this.recipeService = recipeService;
+            this.userService = userService;
         }
         
         public async Task<IActionResult> Index()
@@ -39,6 +42,7 @@ namespace FoodieHub.MVC.Controllers
                 IsActive = true,
             };
             var result = await recipeService.GetAll(query);
+
             return View(result?.Items);
         }
      

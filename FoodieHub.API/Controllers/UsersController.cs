@@ -15,8 +15,6 @@ namespace FoodieHub.API.Controllers
         {
             _service = service;
         }
-        [Authorize(Roles = "Admin")]
-
         [HttpGet]
         public async Task<ActionResult> Get([FromQuery] QueryUserModel query)
         {
