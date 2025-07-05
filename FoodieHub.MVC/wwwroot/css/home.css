@@ -1,0 +1,300 @@
+﻿.home-content {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+#font-aime {
+    font-family: '__aime_138127', '__aime_Fallback_138127';
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.mostFavoriteRecipe:hover a {
+    text-decoration: underline;
+    text-decoration-color: #fc642d;
+}
+
+.info-mostFavoriteRecipe {
+    text-align: center;
+}
+
+    .info-mostFavoriteRecipe a {
+        color: rgb(0,0,0);
+    }
+
+    .info-mostFavoriteRecipe .author img {
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        margin-right: 5px;
+    }
+
+    .info-mostFavoriteRecipe .favorite {
+        bottom: 10px;
+        right: 10px;
+        background-color: #fff;
+        color: #333;
+        font-size: 1rem;
+        border-radius: 15px;
+        padding: 5px 8px;
+        gap: 5px;
+    }
+
+        .info-mostFavoriteRecipe .favorite i {
+            color: #ff6b6b;
+        }
+
+.rating i {
+    color: gold;
+    font-size: 0.8rem;
+    margin-right: 2px;
+}
+
+.card-more-delicious-item {
+    position: relative;
+    background-color: white;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+    overflow: visible; /* Đảm bảo không bị cắt mất */
+    transform-origin: center; /* Phóng lớn từ trung tâm */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+    .card-more-delicious-item:hover {
+        transform: scale(1.05); /* Phóng lớn nhẹ */
+        z-index: 10; /* Đảm bảo nổi lên trên các phần tử khác */
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+.card-more-delicious-item-content {
+    padding: 5px;
+    position: relative;
+}
+
+    .card-more-delicious-item-content img {
+        display: block;
+        width: 100%;
+        height: 200px;
+        border-radius: 15px;
+    }
+
+.card-more-delicious-item h3 {
+    margin: 10px 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Số dòng tối đa */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal; /* Đảm bảo không bị hiển thị trên một dòng */
+    font-size: 0.8rem; /* Kích thước chữ có thể tùy chỉnh */
+    color: #333;
+}
+
+.card-more-delicious-item-content .badges {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+    .card-more-delicious-item-content .badges .badge {
+        display: inline-block; /* Đảm bảo là inline block */
+        max-width: 100%; /* Đặt giới hạn chiều rộng tối đa */
+        white-space: normal; /* Cho phép xuống dòng */
+        word-wrap: break-word; /* Chia chữ khi quá dài */
+        text-align: center; /* Canh giữa chữ */
+        font-size: 0.6rem; /* Đặt kích thước chữ phù hợp */
+        border-radius: 5px; /* Bo góc cho badge */
+    }
+
+    .card-more-delicious-item-content .badges .catename {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .card-more-delicious-item-content .badges .time {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+.card-more-delicious-item-content .favorite {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: #fff;
+    color: #333;
+    font-size: 0.8rem;
+    border-radius: 15px;
+    padding: 5px 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.card-more-delicious-item-content a {
+    color: rgb(0,0,0);
+}
+
+.card-more-delicious-item-content .favorite i {
+    color: #ff6b6b;
+}
+
+.card-more-delicious-item-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    font-size: 0.8rem;
+}
+
+    .card-more-delicious-item-footer .author {
+        display: flex;
+        align-items: center;
+    }
+
+        .card-more-delicious-item-footer .author img {
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            margin-right: 10px;
+        }
+
+    .card-more-delicious-item-footer .rating {
+        display: flex;
+        align-items: center;
+    }
+
+        .card-more-delicious-item-footer .rating i {
+            margin-right: 5px;
+        }
+
+/* From Uiverse.io by 3bdel3ziz-T */
+/*Global btn styles*/
+.btnSeeMore {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    outline: none;
+    vertical-align: middle;
+    text-decoration: none;
+    background: transparent;
+    font-size: 12px;
+    border: none;
+    color: black;
+}
+/*Container styles*/
+.containerbtn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+/*Main button styles*/
+.btnSeeMore {
+    position: relative;
+    height: fit-content;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    width: 110px;
+    height: 8px;
+    text-align: center;
+    text-indent: 35px;
+    transition: 300ms;
+    font-weight: 500;
+}
+
+    .btnSeeMore::before {
+        content: "";
+        transition: all 0.45s cubic-bezier(0.65, 0, 0.076, 1);
+        position: absolute;
+        left: 0;
+        display: block;
+        width: 30px;
+        height: 30px;
+        border-radius: 15px;
+        background-color: #282936;
+        z-index: -1;
+    }
+
+    .btnSeeMore::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 13px;
+        transform: translate(-50%, -50%) rotate(45deg);
+        width: 9px;
+        height: 9px;
+        border-top: 2px solid #fff;
+        border-right: 2px solid #fff;
+        transition: 400ms;
+    }
+
+    .btnSeeMore:hover {
+        text-indent: 10px;
+        color: white;
+        font-weight: 600;
+    }
+
+    .btnSeeMore:active {
+        scale: 0.95;
+    }
+
+    .btnSeeMore:hover::before {
+        width: 100%;
+    }
+
+    .btnSeeMore:hover::after {
+        left: calc(100% - 18px);
+    }
+
+.categoriesRecipes .info-cate {
+    padding: 0 15px;
+    background-color: white;
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+    overflow: visible; /* Đảm bảo không bị cắt mất */
+    transform-origin: center; /* Phóng lớn từ trung tâm */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+    .categoriesRecipes .info-cate:hover {
+        transform: scale(1.05); /* Phóng lớn nhẹ */
+        z-index: 10; /* Đảm bảo nổi lên trên các phần tử khác */
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+.swiper {
+    padding-bottom: 20px; /* chừa chỗ cho pagination */
+}
+
+/* Thu nhỏ nút và đặt lại vị trí */
+.swiper-button-prev,
+.swiper-button-next {
+    width: 30px;
+    height: 30px;
+    background-color: transparent;
+    color: black; /* Mặc định màu đen */
+    border-radius: 50%;
+    font-size: 18px;
+}
+
+    /* Làm icon nhỏ hơn */
+    .swiper-button-prev::after,
+    .swiper-button-next::after {
+        font-size: 18px;
+    }
+
+/* Chế độ nền tối (nếu dùng dark mode qua class hoặc toggle JS) */
+body.dark-mode .swiper-button-prev,
+body.dark-mode .swiper-button-next {
+    color: white;
+}
