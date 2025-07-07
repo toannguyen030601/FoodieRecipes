@@ -168,13 +168,13 @@
             <div class="mt-3">
                 <h3 id="font-aime" style="font-size: 25px;">Explore the best recipes from</h3>
                 <div class="swiper">
-                    <div class="card-swiper">
+                    <div class="card-swiper" style="margin: 20px;">
                         <ul class="swiper-wrapper" style="padding-left: 0px;">
                             @if (getUsersActive != null)
                             {
                                 foreach (var user in getUsersActive)
                                 {
-                                    <li class="text-center border-0 shadow-sm p-2 swiper-slide">
+                                    <li class="text-center border-0 p-3 swiper-slide">
                                         <a href=@("/account/userinfo/"+user.Id)>
                                             <img src="@(!string.IsNullOrEmpty(user.Avatar) ? user.Avatar : "/images/profile.jpg")"
                                                  alt="@user.Fullname"

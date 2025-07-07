@@ -1,7 +1,12 @@
 ﻿@using FoodieHub.MVC.Controllers
+@using FoodieHub.MVC.Service.Interfaces
 @inject IConfiguration config
+@inject IRecipeCategoryService recipeCategories;
+@inject ICategoryService ingredientCategories;
 @{
     var url = config["BaseHost"];
+    var listRecipeCategories = await recipeCategories.GetAll();
+    var listIngredientCategories = ingredientCategories.GetAll();
 }
 <!doctype html>
 <html lang="en">
@@ -50,11 +55,29 @@
                         <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Home" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
                             <a class="nav__link" href="/Home">Home</a>
                         </li>
-                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Products" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
+                        <li class="dropdown @(ViewContext.RouteData.Values["Controller"].ToString() == "Products" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
                             <a class="nav__link" href="/products">Shop</a>
+                            <ul class="dropdown-menu">
+                                @if (listRecipeCategories != null && listRecipeCategories.Any())
+                                {
+                                    @foreach (var ingredientCategory in listIngredientCategories.Result)
+                                    {
+                                        <li><a class="dropdown-item" href="@Url.Action("Index", "Products", new { categoryFilter = ingredientCategory.CategoryID })">@ingredientCategory.CategoryName</a></li>
+                                    }
+                                }
+                            </ul>
                         </li>
-                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Recipes" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
+                        <li class="dropdown @(ViewContext.RouteData.Values["Controller"].ToString() == "Recipes" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
                             <a class="nav__link" href="/recipes">Recipes</a>
+                            <ul class="dropdown-menu">
+                                @if (listRecipeCategories != null && listRecipeCategories.Any())
+                                {
+                                    @foreach (var recipeCategory in listRecipeCategories)
+                                    {
+                                        <li><a class="dropdown-item" href="@Url.Action("Index", "Recipes", new { categoryId = recipeCategory.CategoryID })">@recipeCategory.CategoryName</a></li>
+                                    }
+                                }
+                            </ul>
                         </li>
                         <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Articles" && ViewContext.RouteData.Values["Action"].ToString() == "Index" ? "active" : "")">
                             <a class="nav__link" href="/articles">Articles</a>
@@ -243,3 +266,37 @@
     @await Component.InvokeAsync("Notyf") <!-- Component để hiển thị thông báo -->
 </body>
 </html>
+
+<style>
+    .nav__menu .dropdown .dropdown-menu {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px); /* nhẹ nhàng trượt xuống */
+        transition: all 0.3s ease;
+        display: block; /* luôn để block, nhưng ẩn bằng opacity/visibility */
+        pointer-events: none; /* tránh bị hover khi ẩn */
+    }
+
+    .nav__menu .dropdown:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    /* Style cho dropdown items */
+    .dropdown-menu li .dropdown-item {
+        color: #333333; /* Màu chữ mặc định */
+        text-decoration: none; /* Không gạch chân */
+        padding: 8px 12px;
+        display: block;
+        transition: all 0.3s ease;
+    }
+
+    .dropdown-menu li:hover .dropdown-item {
+            color: #fff; /* Chữ trắng khi hover */
+            background-color: #A18F7A; /* Màu nền khi hover */
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Hiệu ứng shadow nhẹ cho chữ */
+            border-radius: 5px;
+        }
+</style>

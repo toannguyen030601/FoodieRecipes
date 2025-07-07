@@ -281,12 +281,16 @@
 .swiper-button-next {
     width: 30px;
     height: 30px;
-    background-color: transparent;
-    color: black; /* Mặc định màu đen */
+    background-color: rgba(255, 255, 255, 0.8);
+    color: rgba(80, 80, 80, 1);
     border-radius: 50%;
     font-size: 18px;
 }
 
+    .swiper-button-prev:hover,
+    .swiper-button-next:hover {
+        background-color: rgba(255, 225, 210, 0.8);
+    }
     /* Làm icon nhỏ hơn */
     .swiper-button-prev::after,
     .swiper-button-next::after {
@@ -297,4 +301,5 @@
 body.dark-mode .swiper-button-prev,
 body.dark-mode .swiper-button-next {
     color: white;
+
 }
