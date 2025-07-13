@@ -182,8 +182,9 @@ namespace FoodieHub.MVC.Controllers
         public IActionResult Logout()
         {
             Response.DeleteCookie("TokenUser");
-            Response.DeleteCookie("Name");
+            Response.DeleteCookie("FullName");
             Response.DeleteCookie("Avatar");
+            Response.DeleteCookie("UserID");
             NotificationHelper.SetSuccessNotification(this,"Logout successfully");
             return RedirectToAction("Login");
         }
