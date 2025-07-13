@@ -85,7 +85,7 @@ namespace FoodieHub.API.Controllers
         [HttpGet("login-google")]
         public IActionResult GoogleLogin()
         {
-            var redirectUrl = Url.Action(nameof(GoogleLoginCallback), "Auth", "google-response");
+            var redirectUrl = Url.Action(nameof(GoogleLoginCallback), "Auth", null, Request.Scheme);
             var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }

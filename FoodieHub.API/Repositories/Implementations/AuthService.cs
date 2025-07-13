@@ -391,26 +391,31 @@ namespace FoodieHub.API.Repositories.Implementations
             var userID = GetUserID();
             var user = await _userManager.FindByIdAsync(userID);  
             return user;
-        }       
+        }
         public async Task<string> GoogleCallback()
-        {        
+        {
             var result = await _contextAccessor.HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             var data = new GoogleResponse();
+
             if (!result.Succeeded)
             {
                 data.Success = false;
                 data.Message = "Failed to login with Google";
+                return BuildReturnUrl(data);
             }
 
             var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
             var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            if (email == null)
+
+            if (string.IsNullOrEmpty(email))
             {
                 data.Success = false;
-                data.Message = "Not found email";             
+                data.Message = "Not found email";
+                return BuildReturnUrl(data);
             }
 
             var user = await _userManager.FindByEmailAsync(email);
+
             if (user == null)
             {
                 var name = claims?.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
@@ -422,17 +427,19 @@ namespace FoodieHub.API.Repositories.Implementations
                     NormalizedEmail = email.ToUpper(),
                     NormalizedUserName = email.ToUpper()
                 };
-                var result1 = await _userManager.CreateAsync(newUser);
-                if (result1.Succeeded)
+
+                var createResult = await _userManager.CreateAsync(newUser);
+
+                if (createResult.Succeeded)
                 {
                     data.Success = true;
                     data.Message = "Login with Google successfully";
-                    data.Data = AuthExtentions.GenerateToken(newUser.Id, _configuration["JWT:Key"], "");                 
+                    data.Data = AuthExtentions.GenerateToken(newUser.Id, _configuration["JWT:Key"], "");
                 }
                 else
                 {
                     data.Success = false;
-                    data.Message = "An error occurred while creating the user";                  
+                    data.Message = "An error occurred while creating the user";
                 }
             }
             else
@@ -442,10 +449,14 @@ namespace FoodieHub.API.Repositories.Implementations
                 data.Data = AuthExtentions.GenerateToken(user.Id, _configuration["JWT:Key"], "");
             }
 
+            return BuildReturnUrl(data);
+        }
+
+        private string BuildReturnUrl(GoogleResponse data)
+        {
             var jsonData = JsonSerializer.Serialize(data);
             var jsonEncoded = WebUtility.UrlEncode(jsonData);
-            string returnUrl = _configuration["OriginFE"] + $"/account/googlecallback?data={jsonEncoded}";
-            return returnUrl;
+            return _configuration["OriginFE"] + $"/account/googlecallback?data={jsonEncoded}";
         }
 
         public async Task<ServiceResponse> UpdateUser(UpdateProfileDTO user)
